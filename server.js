@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const DEFAULT_PATH = "/Users/dominyk/Desktop/Database";
+const DEFAULT_PATH = "/Users/dominyk/Desktop/GCW Database";
 const userMiddleware = require("./middleware/users");
 
 app.use(bodyParser.json({ type: "application/json" }));

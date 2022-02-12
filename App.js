@@ -172,7 +172,11 @@ const App = () => {
 
   if (!dataLoaded) {
     return (
-      <Loading startAsync={fetchFonts} onFinish={() => setDataLoaded(true)} />
+      <Loading
+        startAsync={fetchFonts}
+        onFinish={() => setDataLoaded(true)}
+        onError={console.warn}
+      />
     );
   }
 

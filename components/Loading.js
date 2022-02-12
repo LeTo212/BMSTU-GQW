@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet, ActivityIndicator } from "react-native";
-import { AppLoading } from "expo";
+import AppLoading from "expo-app-loading";
 
 const Loading = props => {
   return (
