@@ -61,12 +61,12 @@ app.get("/movies", userMiddleware.isLoggedIn, function (req, res) {
           function (error, rows, fields) {
             if (error) console.log(error);
             else {
-              movies.forEach(element => (element["Seasons"] = []));
+              movies.forEach((element) => (element["Seasons"] = []));
 
-              rows.forEach(element => {
+              rows.forEach((element) => {
                 movies
-                  .filter(x => x.MovieID === element.MovieID)
-                  .map(x =>
+                  .filter((x) => x.MovieID === element.MovieID)
+                  .map((x) =>
                     element.Season
                       ? (x["Seasons"][element.Season] = element.Episodes)
                       : null
@@ -184,7 +184,7 @@ app.get("/favorites", userMiddleware.isLoggedIn, function (req, res) {
     function (error, rows, fields) {
       if (error) console.log(error);
       else {
-        res.status(200).json(rows.filter(x => x.isValid == true));
+        res.status(200).json(rows.filter((x) => x.isValid == true));
       }
     }
   );
@@ -245,7 +245,7 @@ app.get("/types_genres", function (req, res) {
     function (error, rows, fields) {
       if (error) console.log(error);
       else {
-        info.Types = Object.keys(rows).map(key => rows[key].Type);
+        info.Types = Object.keys(rows).map((key) => rows[key].Type);
       }
     }
   );
@@ -255,7 +255,7 @@ app.get("/types_genres", function (req, res) {
     function (error, rows, fields) {
       if (error) console.log(error);
       else {
-        info.Genres = Object.keys(rows).map(key => rows[key].Genre);
+        info.Genres = Object.keys(rows).map((key) => rows[key].Genre);
       }
       res.status(200).json(info);
     }

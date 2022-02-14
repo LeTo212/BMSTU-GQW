@@ -2,14 +2,12 @@ import React from "react";
 import { View, StyleSheet, ActivityIndicator } from "react-native";
 import AppLoading from "expo-app-loading";
 
-const Loading = props => {
-  return (
-    <View style={styles.loadingContainer}>
-      <ActivityIndicator size="large" />
-      <AppLoading {...props} />
-    </View>
-  );
-};
+const Loading = (props) => (
+  <View style={styles.loadingContainer}>
+    <ActivityIndicator size="large" />
+    <AppLoading {...props} />
+  </View>
+);
 
 const styles = StyleSheet.create({
   loadingContainer: {

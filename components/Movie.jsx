@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Text, StyleSheet, Dimensions, View } from "react-native";
+import PropTypes from "prop-types";
 import RNPickerSelect from "react-native-picker-select";
 
-import Card from "../components/Card";
+import Card from "./Card";
 import { getVideoPath } from "../api";
-import MoviePlayer from "../components/MoviePlayer";
+import MoviePlayer from "./MoviePlayer";
 
 const { width } = Dimensions.get("window");
 const pickerStyle = {
@@ -35,16 +36,16 @@ const Movie = ({ token, movieInfo }) => {
   const [seasonsList, setSeasonsList] = useState([]);
   const [episodesList, setEpisodesList] = useState([]);
 
-  const updateLists = curSeason => {
+  const updateLists = (curSeason) => {
     if (movieInfo.seasons) {
       const result1 = [];
-      for (var i = 2; i < movieInfo.seasons.length; i++) {
+      for (let i = 2; i < movieInfo.seasons.length; i += 1) {
         result1.push({ label: i.toString(), value: i.toString() });
       }
       setSeasonsList(result1);
 
       const result2 = [];
-      for (var i = 2; i <= movieInfo.seasons[curSeason]; i++) {
+      for (let i = 2; i <= movieInfo.seasons[curSeason]; i += 1) {
         result2.push({
           label: i.toString(),
           value: i.toString(),
@@ -59,7 +60,7 @@ const Movie = ({ token, movieInfo }) => {
   }, [movieInfo]);
 
   const onChange = (curSeason, curEpisode) => {
-    if (curSeason != season) {
+    if (curSeason !== season) {
       updateLists(curSeason);
       setSeason(curSeason);
       setEpisode("1");
@@ -69,7 +70,7 @@ const Movie = ({ token, movieInfo }) => {
   };
 
   return (
-    <>
+    <View>
       {movieInfo.key ? (
         <Card style={styles.videoPlayerContainer}>
           <MoviePlayer
@@ -89,7 +90,7 @@ const Movie = ({ token, movieInfo }) => {
                   selectedValue={season}
                   placeholder={{}}
                   style={pickerStyle}
-                  onValueChange={item => {
+                  onValueChange={(item) => {
                     onChange(item, episode);
                   }}
                 />
@@ -102,21 +103,22 @@ const Movie = ({ token, movieInfo }) => {
                   selectedValue={episode}
                   placeholder={{}}
                   style={pickerStyle}
-                  onValueChange={item => {
+                  onValueChange={(item) => {
                     onChange(season, item);
                   }}
                 />
               </View>
             </View>
-          ) : (
-            <></>
-          )}
+          ) : null}
         </Card>
-      ) : (
-        <></>
-      )}
-    </>
+      ) : null}
+    </View>
   );
+};
+
+Movie.propTypes = {
+  token: PropTypes.string.isRequired,
+  movieInfo: PropTypes.objectOf(PropTypes.any).isRequired,
 };
 
 const styles = StyleSheet.create({

@@ -7,7 +7,7 @@ import SignUp from "../screens/SignUp";
 
 const RootStack = createStackNavigator();
 
-const AuthNav = ({ navigation }) => (
+const AuthNav = () => (
   <RootStack.Navigator headerMode="none">
     <RootStack.Screen name="SignIn" component={SignIn} />
     <RootStack.Screen name="SignUp" component={SignUp} />

@@ -38,7 +38,7 @@ const SignUp = ({ navigation }) => {
     isValidConfirmPassword: true,
   });
 
-  const textInputChange = val => {
+  const textInputChange = (val) => {
     if (val.trim().length >= 4) {
       setData({
         ...data,
@@ -56,7 +56,7 @@ const SignUp = ({ navigation }) => {
     }
   };
 
-  const handleFirstnameChange = val => {
+  const handleFirstnameChange = (val) => {
     if (val.length !== 0) {
       setData({
         ...data,
@@ -72,7 +72,7 @@ const SignUp = ({ navigation }) => {
     }
   };
 
-  const handleMiddlenameChange = val => {
+  const handleMiddlenameChange = (val) => {
     if (val.length !== 0) {
       setData({
         ...data,
@@ -88,7 +88,7 @@ const SignUp = ({ navigation }) => {
     }
   };
 
-  const handleSurnameChange = val => {
+  const handleSurnameChange = (val) => {
     if (val.length !== 0) {
       setData({
         ...data,
@@ -104,7 +104,7 @@ const SignUp = ({ navigation }) => {
     }
   };
 
-  const handlePasswordChange = val => {
+  const handlePasswordChange = (val) => {
     if (val.trim().length >= 8) {
       setData({
         ...data,
@@ -120,7 +120,7 @@ const SignUp = ({ navigation }) => {
     }
   };
 
-  const handleConfirmPasswordChange = val => {
+  const handleConfirmPasswordChange = (val) => {
     if (val.trim().length >= 8) {
       setData({
         ...data,
@@ -150,7 +150,7 @@ const SignUp = ({ navigation }) => {
     });
   };
 
-  const handleValidUser = val => {
+  const handleValidUser = (val) => {
     if (val.trim().length >= 4) {
       setData({
         ...data,
@@ -170,13 +170,13 @@ const SignUp = ({ navigation }) => {
     middlename,
     surname,
     password,
-    password_repeat
+    passwordRepeat
   ) => {
     if (
-      userName.length == 0 ||
-      firstname.length == 0 ||
-      surname.length == 0 ||
-      password.length == 0
+      userName.length === 0 ||
+      firstname.length === 0 ||
+      surname.length === 0 ||
+      password.length === 0
     ) {
       Alert.alert(
         "Неправильный ввод!",
@@ -192,7 +192,7 @@ const SignUp = ({ navigation }) => {
       ]);
     }
 
-    if (password !== password_repeat) {
+    if (password !== passwordRepeat) {
       Alert.alert("Неправильный ввод!", "Пароли не совпадают.", [
         { text: "Хорошо" },
       ]);
@@ -204,7 +204,7 @@ const SignUp = ({ navigation }) => {
       middlename,
       surname,
       password,
-      password_repeat
+      passwordRepeat
     );
 
     if (user.statusCode === 201) {
@@ -218,7 +218,6 @@ const SignUp = ({ navigation }) => {
       Alert.alert("Ошибка!", "Аккаунт с такой почтой уже существует.", [
         { text: "Хорошо" },
       ]);
-      return;
     }
   };
 
@@ -240,8 +239,8 @@ const SignUp = ({ navigation }) => {
               placeholder="Введите почту"
               style={styles.textInput}
               autoCapitalize="none"
-              onChangeText={val => textInputChange(val)}
-              onEndEditing={e => handleValidUser(e.nativeEvent.text)}
+              onChangeText={(val) => textInputChange(val)}
+              onEndEditing={(e) => handleValidUser(e.nativeEvent.text)}
             />
             {data.check_textInputChange ? (
               <Animatable.View animation="bounceIn">
@@ -273,7 +272,7 @@ const SignUp = ({ navigation }) => {
               placeholder="Введите имя"
               style={styles.textInput}
               autoCapitalize="none"
-              onChangeText={val => handleFirstnameChange(val)}
+              onChangeText={(val) => handleFirstnameChange(val)}
             />
             {data.check_firstnameInputChange ? (
               <Animatable.View animation="bounceIn">
@@ -298,7 +297,7 @@ const SignUp = ({ navigation }) => {
               placeholder="Введите отчество"
               style={styles.textInput}
               autoCapitalize="none"
-              onChangeText={val => handleMiddlenameChange(val)}
+              onChangeText={(val) => handleMiddlenameChange(val)}
             />
             {data.check_middlenameInputChange ? (
               <Animatable.View animation="bounceIn">
@@ -323,7 +322,7 @@ const SignUp = ({ navigation }) => {
               placeholder="Введите фамилию"
               style={styles.textInput}
               autoCapitalize="none"
-              onChangeText={val => handleSurnameChange(val)}
+              onChangeText={(val) => handleSurnameChange(val)}
             />
             {data.check_surnameInputChange ? (
               <Animatable.View animation="bounceIn">
@@ -346,10 +345,10 @@ const SignUp = ({ navigation }) => {
             <Feather name="lock" color="#05375a" size={20} />
             <TextInput
               placeholder="Введите пароль"
-              secureTextEntry={data.secureTextEntry ? true : false}
+              secureTextEntry={!!data.secureTextEntry}
               style={styles.textInput}
               autoCapitalize="none"
-              onChangeText={val => handlePasswordChange(val)}
+              onChangeText={(val) => handlePasswordChange(val)}
               value={data.password}
             />
             <TouchableOpacity onPress={updateSecureTextEntry}>
@@ -382,10 +381,10 @@ const SignUp = ({ navigation }) => {
             <Feather name="lock" color="#05375a" size={20} />
             <TextInput
               placeholder="Повторите пароль"
-              secureTextEntry={data.confirm_secureTextEntry ? true : false}
+              secureTextEntry={!!data.confirm_secureTextEntry}
               style={styles.textInput}
               autoCapitalize="none"
-              onChangeText={val => handleConfirmPasswordChange(val)}
+              onChangeText={(val) => handleConfirmPasswordChange(val)}
               value={data.confirm_password}
             />
             <TouchableOpacity onPress={updateConfirmSecureTextEntry}>

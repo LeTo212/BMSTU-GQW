@@ -1,9 +1,10 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Dimensions, View, Text, StyleSheet, Image } from "react-native";
 
-import Genres from "../components/Genres";
-import Rating from "../components/Rating";
-import Card from "../components/Card";
+import Genres from "./Genres";
+import Rating from "./Rating";
+import Card from "./Card";
 
 export const deviceWidth = Dimensions.get("window").width;
 
@@ -17,6 +18,10 @@ const MovieListItem = ({ movie }) => (
     </View>
   </Card>
 );
+
+MovieListItem.propTypes = {
+  movie: PropTypes.objectOf(PropTypes.object).isRequired,
+};
 
 const styles = StyleSheet.create({
   container: {

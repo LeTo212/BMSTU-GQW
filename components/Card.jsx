@@ -1,12 +1,21 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import PropTypes from "prop-types";
+import { View, StyleSheet, ViewPropTypes } from "react-native";
 
 import Colors from "../constants/colors";
 
-const Card = props => {
-  return (
-    <View style={{ ...styles.card, ...props.style }}>{props.children}</View>
-  );
+const Card = ({ style, children }) => (
+  <View style={{ ...styles.card, ...style }}>{children}</View>
+);
+
+Card.propTypes = {
+  style: ViewPropTypes.style,
+  children: PropTypes.node,
+};
+
+Card.defaultProps = {
+  style: null,
+  children: null,
 };
 
 const styles = StyleSheet.create({

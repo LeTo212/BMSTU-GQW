@@ -1,0 +1,43 @@
+{
+  "env": {
+    "es2021": true,
+    "node": true,
+    "react-native/react-native": true
+  },
+  "extends": ["plugin:react/recommended", "airbnb", "airbnb/hooks", "prettier"],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": ["react", "react-native"],
+  "globals": { "API_URL": true, "AuthContext": true },
+  "rules": {
+    "no-use-before-define": ["error", { "variables": false }],
+
+    "react/prop-types": [
+      "error",
+      { "ignore": ["navigation", "navigation.navigate"] }
+    ],
+
+    "no-unused-vars": [
+      "warn",
+      { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }
+    ],
+
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+
+    "react/no-unstable-nested-components": ["error", { "allowAsProps": true }],
+
+    "react/function-component-definition": [
+      2,
+      { "namedComponents": "arrow-function" }
+    ],
+
+    "react/jsx-props-no-spreading": "off",
+
+    "react-hooks/exhaustive-deps": "off"
+  }
+}

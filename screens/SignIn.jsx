@@ -18,7 +18,7 @@ import Feather from "react-native-vector-icons/Feather";
 import { useTheme } from "react-native-paper";
 
 import { checkUser } from "../api";
-import { AuthContext } from "../constants/context";
+import AuthContext from "../constants/context";
 import Colors from "../constants/colors";
 
 const SignIn = ({ navigation }) => {
@@ -35,7 +35,7 @@ const SignIn = ({ navigation }) => {
 
   const { signIn } = React.useContext(AuthContext);
 
-  const textInputChange = val => {
+  const textInputChange = (val) => {
     if (val.trim().length >= 4) {
       setData({
         ...data,
@@ -53,7 +53,7 @@ const SignIn = ({ navigation }) => {
     }
   };
 
-  const handlePasswordChange = val => {
+  const handlePasswordChange = (val) => {
     if (val.trim().length >= 8) {
       setData({
         ...data,
@@ -76,7 +76,7 @@ const SignIn = ({ navigation }) => {
     });
   };
 
-  const handleValidUser = val => {
+  const handleValidUser = (val) => {
     if (val.trim().length >= 4) {
       setData({
         ...data,
@@ -91,7 +91,7 @@ const SignIn = ({ navigation }) => {
   };
 
   const loginHandle = async (userName, password) => {
-    if (userName.length == 0 || password.length == 0) {
+    if (userName.length === 0 || password.length === 0) {
       Alert.alert(
         "Неправильный ввод!",
         "Почта или пароль не могут быть пустыми.",
@@ -154,8 +154,8 @@ const SignIn = ({ navigation }) => {
               },
             ]}
             autoCapitalize="none"
-            onChangeText={val => textInputChange(val)}
-            onEndEditing={e => handleValidUser(e.nativeEvent.text)}
+            onChangeText={(val) => textInputChange(val)}
+            onEndEditing={(e) => handleValidUser(e.nativeEvent.text)}
           />
           {data.check_textInputChange ? (
             <Animatable.View animation="bounceIn">
@@ -187,7 +187,7 @@ const SignIn = ({ navigation }) => {
           <TextInput
             placeholder="Введите пароль"
             placeholderTextColor="#666666"
-            secureTextEntry={data.secureTextEntry ? true : false}
+            secureTextEntry={!!data.secureTextEntry}
             style={[
               styles.textInput,
               {
@@ -195,7 +195,7 @@ const SignIn = ({ navigation }) => {
               },
             ]}
             autoCapitalize="none"
-            onChangeText={val => handlePasswordChange(val)}
+            onChangeText={(val) => handlePasswordChange(val)}
             value={data.password}
           />
           <TouchableOpacity onPress={updateSecureTextEntry}>

@@ -12,21 +12,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Loading from "../components/Loading";
 
-import { AuthContext } from "../constants/context";
 import { getMovies, getFavorites } from "../api";
+import AuthContext from "../constants/context";
 import Card from "../components/Card";
 import MovieListItem from "../components/MovieListItem";
 
-const wait = timeout => {
-  return new Promise(resolve => {
+const source = require("../assets/userIcon.png");
+
+const wait = (timeout) =>
+  new Promise((resolve) => {
     setTimeout(resolve, timeout);
   });
-};
 
 const Profile = ({ navigation }) => {
   const [user, setUser] = useState();
   const [movies, setMovies] = useState([]);
-  const [userFavorites, setUserFavorites] = useState();
+  const [userFavorites, setUserFavorites] = useState([]);
   const [token, setToken] = useState();
   const { getToken } = React.useContext(AuthContext);
   const { getUser, signOut } = React.useContext(AuthContext);
@@ -34,7 +35,7 @@ const Profile = ({ navigation }) => {
 
   const fetchData = async () => {
     const favorites = await getFavorites(token);
-    if (favorites != null) setUserFavorites(favorites.data);
+    if (favorites != null) setUserFavorites(favorites);
   };
 
   const onRefresh = React.useCallback(() => {
@@ -44,37 +45,36 @@ const Profile = ({ navigation }) => {
   }, [userFavorites]);
 
   useEffect(() => {
-    getToken().then(data => {
+    getToken().then((data) => {
+      if (!data) {
+        signOut();
+        return;
+      }
+
       setToken(data);
-      fetchMovies();
     });
 
-    getUser().then(data => {
+    getUser().then((data) => {
       setUser(data);
     });
 
     const fetchMovies = async () => {
-      const movies = await getMovies(token);
-      if (movies != null) {
-        if (movies.statusCode === 401) {
-          signOut();
-          return;
-        }
-
-        setMovies(movies.data);
-      }
+      const mvs = await getMovies(token);
+      if (mvs !== "Error") {
+        setMovies(mvs);
+      } else signOut();
     };
 
-    if (userFavorites == null) {
+    if (userFavorites.length === 0 && token) {
       fetchData();
     }
 
-    if (movies.length === 0 || token == null) {
-      fetchMovies(movies);
+    if (movies.length === 0 && token) {
+      fetchMovies();
     }
   }, [movies, token]);
 
-  if (movies.length === 0 || token == null || user == null) {
+  if (movies.length === 0 || !token || !user) {
     return <Loading />;
   }
 
@@ -82,7 +82,7 @@ const Profile = ({ navigation }) => {
     <SafeAreaView style={{ flex: 1 }}>
       <Card style={styles.profile}>
         <Image
-          source={require("../assets/userIcon.png")}
+          source={source}
           style={{
             width: 100,
             height: 100,
@@ -95,15 +95,11 @@ const Profile = ({ navigation }) => {
             <Text style={styles.text}>Имя: {user.firstname}</Text>
             {user.middlename ? (
               <Text style={styles.text}>Отчество: {user.middlename}</Text>
-            ) : (
-              <></>
-            )}
+            ) : null}
             <Text style={styles.text}>Фамилия: {user.surname}</Text>
             <Text style={styles.text}>Почта: {user.email}</Text>
           </View>
-        ) : (
-          <></>
-        )}
+        ) : null}
 
         <View style={styles.signOut}>
           <TouchableOpacity
@@ -129,17 +125,19 @@ const Profile = ({ navigation }) => {
       <FlatList
         style={{ width: "100%", height: "100%" }}
         contentContainerStyle={{ alignItems: "center", paddingTop: "5%" }}
-        data={movies.filter(x =>
-          userFavorites ? userFavorites.find(el => el.MovieID == x.key) : null
+        data={movies.filter((x) =>
+          userFavorites
+            ? userFavorites.find((el) => el.MovieID === x.key)
+            : null
         )}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        renderItem={movie => (
+        renderItem={(movie) => (
           <TouchableOpacity
             activeOpacity={0.4}
             onPress={() =>
-              navigation.navigate("Movie", { token: token, movie: movie.item })
+              navigation.navigate("Movie", { token, movie: movie.item })
             }
           >
             <MovieListItem key={movie.key} movie={movie.item} />

@@ -11,8 +11,9 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { AntDesign } from "@expo/vector-icons";
-import { AuthContext } from "../constants/context";
+import PropTypes from "prop-types";
 
+import AuthContext from "../constants/context";
 import Movie from "../components/Movie";
 import Genres from "../components/Genres";
 import Card from "../components/Card";
@@ -26,9 +27,9 @@ const ITEM_SIZE = Platform.OS === "ios" ? width * 0.72 : width * 0.74;
 const BACKDROP_HEIGHT = height * 0.65;
 const FAVORITE_COLOR = "#DC7633";
 
-const MoviePage = props => {
-  const token = props.route.params.token;
-  const movie = props.route.params.movie;
+const MoviePage = ({ route }) => {
+  const { token } = route.params;
+  const { movie } = route.params;
   const { signOut } = React.useContext(AuthContext);
   const [isFavorite, setIsFavorite] = useState();
 
@@ -36,14 +37,9 @@ const MoviePage = props => {
     const fetchData = async () => {
       const favorites = await getFavorites(token);
 
-      if (favorites.statusCode === 401) {
-        signOut();
-        return;
-      }
-
-      setIsFavorite(
-        favorites.data.find(x => x.MovieID == movie.key) ? true : false
-      );
+      if (favorites !== "Error") {
+        setIsFavorite(!!favorites.find((x) => x.MovieID === movie.key));
+      } else signOut();
     };
 
     if (isFavorite == null) {
@@ -156,6 +152,10 @@ const MoviePage = props => {
       </View>
     </ScrollView>
   );
+};
+
+MoviePage.propTypes = {
+  route: PropTypes.objectOf(PropTypes.any).isRequired,
 };
 
 const styles = StyleSheet.create({

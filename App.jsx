@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, StatusBar, ActivityIndicator, View } from "react-native";
+import {
+  StyleSheet,
+  StatusBar,
+  ActivityIndicator,
+  View,
+  LogBox,
+} from "react-native";
 import "react-native-gesture-handler";
 import {
   NavigationContainer,
@@ -10,16 +16,12 @@ import {
   DefaultTheme as PaperDefaultTheme,
 } from "react-native-paper";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
+import { MaterialCommunityIcons, AntDesign } from "@expo/vector-icons";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Font from "expo-font";
-import { LogBox } from "react-native";
-LogBox.ignoreLogs(["Warning: ..."]);
-LogBox.ignoreAllLogs();
 
-//Screens
+// Screens
 import AuthNav from "./navigation/AuthNav";
 import HomeNav from "./navigation/HomeNav";
 import SearchNav from "./navigation/SearchNav";
@@ -27,17 +29,20 @@ import ProfileNav from "./navigation/ProfileNav";
 import Help from "./screens/Help";
 //
 
-import { AuthContext } from "./constants/context";
+import AuthContext from "./constants/context";
 import Loading from "./components/Loading";
 import Colors from "./constants/colors";
 
-const Tab = createMaterialBottomTabNavigator();
+LogBox.ignoreLogs(["Warning: ..."]);
+LogBox.ignoreAllLogs();
 
-const fetchFonts = () => {
-  return Font.loadAsync({
-    Menlo: require("./assets/fonts/Menlo-Regular.ttf"),
+const Tab = createMaterialBottomTabNavigator();
+const font = require("./assets/fonts/Menlo-Regular.ttf");
+
+const fetchFonts = () =>
+  Font.loadAsync({
+    Menlo: font,
   });
-};
 
 const App = () => {
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -86,6 +91,13 @@ const App = () => {
           userToken: action.token,
           isLoading: false,
         };
+      default:
+        return {
+          ...prevState,
+          userName: null,
+          userToken: null,
+          isLoading: false,
+        };
     }
   };
 
@@ -103,8 +115,9 @@ const App = () => {
             return value;
           }
         } catch (e) {
-          console.log(e);
+          console.error(e);
         }
+        return null;
       },
       getUser: async () => {
         try {
@@ -113,10 +126,11 @@ const App = () => {
             return JSON.parse(value);
           }
         } catch (e) {
-          console.log(e);
+          console.error(e);
         }
+        return null;
       },
-      signIn: async foundUser => {
+      signIn: async (foundUser) => {
         const userToken = String(foundUser.token);
 
         const user = {
@@ -131,7 +145,7 @@ const App = () => {
           await AsyncStorage.setItem("userToken", userToken);
           await AsyncStorage.setItem("userInfo", JSON.stringify(user));
         } catch (e) {
-          console.log(e);
+          console.error(e);
         }
         dispatch({ type: "LOGIN", id: user.email, token: userToken });
       },
@@ -140,7 +154,7 @@ const App = () => {
           await AsyncStorage.removeItem("userToken");
           await AsyncStorage.removeItem("userInfo");
         } catch (e) {
-          console.log(e);
+          console.error(e);
         }
         dispatch({ type: "LOGOUT" });
       },
@@ -156,7 +170,7 @@ const App = () => {
       try {
         userToken = await AsyncStorage.getItem("userToken");
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
       dispatch({ type: "RETRIEVE_TOKEN", token: userToken });
     }, 1000);

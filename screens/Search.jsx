@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
   Text,
+  Platform,
 } from "react-native";
 import { Searchbar } from "react-native-paper";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -13,8 +14,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { debounce } from "lodash";
 
-import { AuthContext } from "../constants/context";
 import { getMovies, getTypesAndGenres } from "../api";
+import AuthContext from "../constants/context";
 import Loading from "../components/Loading";
 import MovieListItem from "../components/MovieListItem";
 import Colors from "../constants/colors";
@@ -32,28 +33,28 @@ const Search = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    getToken().then(data => {
+    getToken().then((data) => {
+      if (!data) {
+        signOut();
+        return;
+      }
+
       setToken(data);
     });
 
     const fetchData = async () => {
-      const movies = await getMovies(token);
+      const mvs = await getMovies(token);
 
-      if (movies != null) {
-        if (movies.statusCode === 401) {
-          signOut();
-          return;
-        }
+      if (mvs !== "Error") {
+        const lst = await getTypesAndGenres();
 
-        const list = await getTypesAndGenres();
-
-        setMovies(movies.data);
-        setList(list);
-        setFilteredMovies(movies.data);
-      }
+        setMovies(mvs);
+        setList(lst);
+        setFilteredMovies(mvs);
+      } else signOut();
     };
 
-    if (movies.length === 0 || Object.keys(list).length === 0) {
+    if ((movies.length === 0 || Object.keys(list).length === 0) && token) {
       fetchData(movies, list);
     }
   }, [movies, list, token]);
@@ -71,15 +72,14 @@ const Search = ({ navigation }) => {
     if (query.length === 0 && filterType === "" && filterGenre === "") {
       setFilteredMovies(movies);
     } else {
-      const list = movies.filter(movie => {
-        return (
+      const lst = movies.filter(
+        (movie) =>
           movie.title.toLowerCase().includes(query.toLowerCase()) &&
           movie.type.includes(filterType) &&
           (filterGenre === "" ? true : movie.genres.includes(filterGenre))
-        );
-      });
+      );
 
-      setFilteredMovies(list);
+      setFilteredMovies(lst);
     }
   };
 
@@ -101,7 +101,7 @@ const Search = ({ navigation }) => {
 
       <Searchbar
         placeholder="Поиск"
-        onChangeText={query => {
+        onChangeText={(query) => {
           setSearchQuery(query);
           handler(query, type, genre);
         }}
@@ -129,7 +129,7 @@ const Search = ({ navigation }) => {
               justifyContent: "flex-start",
             }}
             dropDownStyle={{ backgroundColor: "#fafafa" }}
-            onChangeItem={item => {
+            onChangeItem={(item) => {
               setType(item.value);
               handler(searchQuery, item.value, genre);
             }}
@@ -147,7 +147,7 @@ const Search = ({ navigation }) => {
               justifyContent: "flex-start",
             }}
             dropDownStyle={{ backgroundColor: "#fafafa" }}
-            onChangeItem={item => {
+            onChangeItem={(item) => {
               setGenre(item.value);
               handler(searchQuery, type, item.value);
             }}
@@ -159,11 +159,11 @@ const Search = ({ navigation }) => {
         style={{ width: "100%", height: "100%" }}
         contentContainerStyle={{ alignItems: "center", paddingTop: "5%" }}
         data={filteredMovies}
-        renderItem={movie => (
+        renderItem={(movie) => (
           <TouchableOpacity
             activeOpacity={0.4}
             onPress={() =>
-              navigation.navigate("Movie", { token: token, movie: movie.item })
+              navigation.navigate("Movie", { token, movie: movie.item })
             }
           >
             <MovieListItem key={movie.key} movie={movie.item} />

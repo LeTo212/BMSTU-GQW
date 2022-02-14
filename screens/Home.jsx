@@ -11,9 +11,10 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import PropTypes from "prop-types";
 
-import { AuthContext } from "../constants/context";
 import { getMovies } from "../api";
+import AuthContext from "../constants/context";
 import CustomStatusBar from "../components/CustomStatusBar";
 import Loading from "../components/Loading";
 import Genres from "../components/Genres";
@@ -27,57 +28,60 @@ const ITEM_SIZE = Platform.OS === "ios" ? width * 0.72 : width * 0.74;
 const EMPTY_ITEM_SIZE = (width - ITEM_SIZE) / 2;
 const BACKDROP_HEIGHT = height * 0.65;
 
-const Backdrop = ({ movies, scrollX }) => {
-  return (
-    <View style={{ height: BACKDROP_HEIGHT, width, position: "absolute" }}>
-      <FlatList
-        data={movies}
-        keyExtractor={item => item.key + "-backdrop"}
-        horizontal
-        removeClippedSubviews={false}
-        contentContainerStyle={{ width, height: BACKDROP_HEIGHT }}
-        renderItem={({ item, index }) => {
-          if (!item.backdrop) {
-            return null;
-          }
-          const translateX = scrollX.interpolate({
-            inputRange: [(index - 2) * ITEM_SIZE, (index - 1) * ITEM_SIZE],
-            outputRange: [0, width],
-            // extrapolate:'clamp'
-          });
-          return (
-            <Animated.View
-              removeClippedSubviews={false}
+const Backdrop = ({ movies, scrollX }) => (
+  <View style={{ height: BACKDROP_HEIGHT, width, position: "absolute" }}>
+    <FlatList
+      data={movies}
+      keyExtractor={(item) => `${item.key}-backdrop`}
+      horizontal
+      removeClippedSubviews={false}
+      contentContainerStyle={{ width, height: BACKDROP_HEIGHT }}
+      renderItem={({ item, index }) => {
+        if (!item.backdrop) {
+          return null;
+        }
+        const translateX = scrollX.interpolate({
+          inputRange: [(index - 2) * ITEM_SIZE, (index - 1) * ITEM_SIZE],
+          outputRange: [0, width],
+          // extrapolate:'clamp'
+        });
+        return (
+          <Animated.View
+            removeClippedSubviews={false}
+            style={{
+              position: "absolute",
+              width: translateX,
+              height,
+              overflow: "hidden",
+            }}
+          >
+            <Image
+              source={{ uri: item.backdrop }}
               style={{
+                width,
+                height: BACKDROP_HEIGHT,
                 position: "absolute",
-                width: translateX,
-                height,
-                overflow: "hidden",
               }}
-            >
-              <Image
-                source={{ uri: item.backdrop }}
-                style={{
-                  width,
-                  height: BACKDROP_HEIGHT,
-                  position: "absolute",
-                }}
-              />
-            </Animated.View>
-          );
-        }}
-      />
-      <LinearGradient
-        colors={["rgba(0, 0, 0, 0)", styles.screen.backgroundColor]}
-        style={{
-          height: BACKDROP_HEIGHT,
-          width,
-          position: "absolute",
-          bottom: 0,
-        }}
-      />
-    </View>
-  );
+            />
+          </Animated.View>
+        );
+      }}
+    />
+    <LinearGradient
+      colors={["rgba(0, 0, 0, 0)", styles.screen.backgroundColor]}
+      style={{
+        height: BACKDROP_HEIGHT,
+        width,
+        position: "absolute",
+        bottom: 0,
+      }}
+    />
+  </View>
+);
+
+Backdrop.propTypes = {
+  movies: PropTypes.arrayOf(PropTypes.object).isRequired,
+  scrollX: PropTypes.instanceOf(Animated.Value).isRequired,
 };
 
 const Home = ({ navigation }) => {
@@ -88,40 +92,38 @@ const Home = ({ navigation }) => {
   const viewConfigRef = useRef({
     viewAreaCoveragePercentThreshold: 1,
   });
-  const onViewableItemsChanged = useRef(({ viewableItems, changed }) => {
-    viewableItems[1] ? setCurrentMovie(viewableItems[1].item) : null;
-  });
+  const onViewableItemsChanged = useRef(({ viewableItems }) =>
+    viewableItems[1] ? setCurrentMovie(viewableItems[1].item) : null
+  );
   const scrollX = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    getToken().then(data => {
+    getToken().then((data) => {
+      if (!data) {
+        signOut();
+        return;
+      }
+
       setToken(data);
     });
 
     const fetchData = async () => {
-      const movies = await getMovies(token);
+      const mvs = await getMovies(token);
 
-      if (movies != null) {
-        if (movies.statusCode === 401) {
-          signOut();
-          return;
-        }
-
-        const filtered = movies.data.filter(el => {
-          return parseFloat(el.rating) >= 8.7;
-        });
+      if (mvs !== "Error") {
+        const filtered = mvs.filter((el) => parseFloat(el.rating) >= 8.7);
 
         setMovies([{ key: "empty-left" }, ...filtered, { key: "empty-right" }]);
         setCurrentMovie(filtered[0]);
-      }
+      } else signOut();
     };
 
-    if (movies.length === 0 || token == null) {
-      fetchData(movies);
+    if (movies.length === 0 && token) {
+      fetchData();
     }
   }, [movies, token]);
 
-  if (movies.length === 0 || token == null) {
+  if (movies.length === 0 || !token) {
     return <Loading />;
   }
 
@@ -138,7 +140,7 @@ const Home = ({ navigation }) => {
           viewabilityConfig={viewConfigRef.current}
           showsHorizontalScrollIndicator={false}
           data={movies}
-          keyExtractor={item => item.key}
+          keyExtractor={(item) => item.key}
           horizontal
           bounces={false}
           decelerationRate={Platform.OS === "ios" ? 0 : 0.98}
@@ -174,7 +176,7 @@ const Home = ({ navigation }) => {
                   activeOpacity={0.4}
                   onPress={() =>
                     navigation.navigate("Movie", {
-                      token: token,
+                      token,
                       movie: currentMovie,
                     })
                   }
@@ -212,7 +214,7 @@ const styles = StyleSheet.create({
   },
   moviesCarouselContainer: {
     width: ITEM_SIZE,
-    height: height,
+    height,
     justifyContent: "center",
   },
   poster: {

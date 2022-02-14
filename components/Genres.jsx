@@ -1,18 +1,19 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { View, Text, StyleSheet } from "react-native";
 
-const Genres = ({ genres }) => {
-  return (
-    <View style={styles.genres}>
-      {genres.map(genre => {
-        return (
-          <View key={genre} style={styles.genre}>
-            <Text style={styles.genreText}>{genre}</Text>
-          </View>
-        );
-      })}
-    </View>
-  );
+const Genres = ({ genres }) => (
+  <View style={styles.genres}>
+    {genres.map((genre) => (
+      <View key={genre} style={styles.genre}>
+        <Text style={styles.genreText}>{genre}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+Genres.propTypes = {
+  genres: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 const styles = StyleSheet.create({
