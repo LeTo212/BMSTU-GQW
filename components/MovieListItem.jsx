@@ -20,7 +20,7 @@ const MovieListItem = ({ movie }) => (
 );
 
 MovieListItem.propTypes = {
-  movie: PropTypes.objectOf(PropTypes.object).isRequired,
+  movie: PropTypes.objectOf(PropTypes.any).isRequired,
 };
 
 const styles = StyleSheet.create({

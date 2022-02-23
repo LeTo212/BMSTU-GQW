@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { View, StyleSheet, Dimensions, Modal, StatusBar } from "react-native";
+import { View, StyleSheet, Dimensions, Modal } from "react-native";
 import { Video } from "expo-av";
 import VideoPlayer from "expo-video-player";
 import * as ScreenOrientation from "expo-screen-orientation";
@@ -47,20 +47,18 @@ const MoviePlayer = ({ uri }) => {
     );
   }
   return (
-    <>
-      <StatusBar backgroundColor="black" />
-      <Modal
-        style={styles.fullscreenVideo}
-        supportedOrientations={["portrait", "landscape"]}
-      >
-        {video()}
-      </Modal>
-    </>
+    <Modal
+      style={styles.fullscreenVideo}
+      supportedOrientations={["portrait", "landscape"]}
+      statusBarTranslucent
+    >
+      {video()}
+    </Modal>
   );
 };
 
 MoviePlayer.propTypes = {
-  uri: PropTypes.string.isRequired,
+  uri: PropTypes.objectOf(PropTypes.any).isRequired,
 };
 
 const styles = StyleSheet.create({

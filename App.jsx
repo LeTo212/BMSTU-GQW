@@ -19,6 +19,8 @@ import { createMaterialBottomTabNavigator } from "@react-navigation/material-bot
 import { MaterialCommunityIcons, AntDesign } from "@expo/vector-icons";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+/* eslint import/no-extraneous-dependencies: "off" */
 import * as Font from "expo-font";
 
 // Screens
@@ -33,8 +35,7 @@ import AuthContext from "./constants/context";
 import Loading from "./components/Loading";
 import Colors from "./constants/colors";
 
-LogBox.ignoreLogs(["Warning: ..."]);
-LogBox.ignoreAllLogs();
+if (!__DEV__) LogBox.ignoreAllLogs();
 
 const Tab = createMaterialBottomTabNavigator();
 const font = require("./assets/fonts/Menlo-Regular.ttf");

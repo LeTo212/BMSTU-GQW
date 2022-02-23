@@ -4,7 +4,12 @@ import AppLoading from "expo-app-loading";
 
 const Loading = (props) => (
   <View style={styles.loadingContainer}>
-    <ActivityIndicator size="large" />
+    <ActivityIndicator
+      animating
+      size="large"
+      style={{ opacity: 1 }}
+      color="#757575"
+    />
     <AppLoading {...props} />
   </View>
 );
