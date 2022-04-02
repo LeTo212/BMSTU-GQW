@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import RNPickerSelect from "react-native-picker-select";
 
 import Card from "./Card";
-import { getVideoPath } from "../api";
+import { getVideoPath, addToHistory } from "../api";
 import MoviePlayer from "./MoviePlayer";
 
 const { width } = Dimensions.get("window");
@@ -35,6 +35,7 @@ const Movie = ({ token, movieInfo }) => {
   const [episode, setEpisode] = useState("1");
   const [seasonsList, setSeasonsList] = useState([]);
   const [episodesList, setEpisodesList] = useState([]);
+  const [playButtonPressed, setPlayButtonPressed] = useState(false);
 
   const updateLists = (curSeason) => {
     if (movieInfo.seasons) {
@@ -69,6 +70,14 @@ const Movie = ({ token, movieInfo }) => {
     }
   };
 
+  const moviePlayerHandler = (status) => {
+    if (status.isPlaying !== playButtonPressed) {
+      setPlayButtonPressed(status.isPlaying);
+
+      if (status.isPlaying) addToHistory(token, movieInfo.key);
+    }
+  };
+
   return (
     <View>
       {movieInfo.key ? (
@@ -80,6 +89,7 @@ const Movie = ({ token, movieInfo }) => {
               movieInfo.seasons.length !== 0 ? season : null,
               movieInfo.seasons.length !== 0 ? episode : null
             )}
+            playbackCallback={moviePlayerHandler}
           />
           {movieInfo.seasons.length !== 0 ? (
             <View style={styles.pickersContainer}>

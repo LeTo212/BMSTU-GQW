@@ -37,7 +37,7 @@ const MoviePage = ({ route }) => {
     const fetchData = async () => {
       const favorites = await getFavorites(token);
 
-      if (favorites !== "Error") {
+      if (favorites !== "Not authorized") {
         setIsFavorite(!!favorites.find((x) => x.MovieID === movie.key));
       } else signOut();
     };
@@ -49,7 +49,7 @@ const MoviePage = ({ route }) => {
 
   const pressHandler = (movieID, isValid) => {
     setIsFavorite(isValid);
-    changeFavorite(movieID, isValid, token);
+    changeFavorite(token, movieID, isValid);
   };
 
   if (isFavorite == null) {

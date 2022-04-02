@@ -37,16 +37,18 @@ app.get("/movies", userMiddleware.isLoggedIn, function (req, res) {
     "SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));"
   );
   connection.query(
-    "select m.MovieID, m.Title, t.Name as 'Type', group_concat(distinct g.Name separator ', ') as 'Genres', \
-      group_concat(distinct Concat(d.Name,' ', Ifnull(d.MiddleName,' '), d.Surname) separator ', ') as 'Directors', \
+    "SELECT m.MovieID, m.Title, t.Name AS 'Type', GROUP_CONCAT(DISTINCT g.Name SEPARATOR ', ') AS 'Genres', \
+      GROUP_CONCAT(DISTINCT CONCAT(d.Name,' ', IFNULL(d.MiddleName,' '), d.Surname) SEPARATOR ', ') AS 'Directors', \
       m.Rating, m.Description, m.ReleaseDate \
-    from Movie m, Type t, Director_Movie d_m, Director d, Genre_Movie g_m, Genre g \
-    where m.TypeID = t.TypeID and d.DirectorID = d_m.DirectorID \
-      and m.MovieID = d_m.MovieID and g.GenreID = g_m.GenreID and m.MovieID = g_m.MovieID \
-    group by m.MovieID;",
-    function (error, rows, fields) {
-      if (error) console.log(error);
-      else {
+    FROM Movie m, Type t, Director_Movie d_m, Director d, Genre_Movie g_m, Genre g \
+    WHERE m.TypeID = t.TypeID AND d.DirectorID = d_m.DirectorID \
+      AND m.MovieID = d_m.MovieID AND g.GenreID = g_m.GenreID AND m.MovieID = g_m.MovieID \
+    GROUP BY m.MovieID;",
+    function (error, rows) {
+      if (error) {
+        console.log(error);
+        res.status(400).send();
+      } else {
         rows.forEach(function (part, index, arr) {
           arr[index].Genres = arr[index].Genres.split(", ");
           arr[index].Directors = arr[index].Directors.split(", ");
@@ -54,13 +56,15 @@ app.get("/movies", userMiddleware.isLoggedIn, function (req, res) {
         const movies = rows;
 
         connection.query(
-          "select m.MovieID, v.Season as 'Season', max(v.Episode) as 'Episodes' \
-          from Movie m, Video v \
-          where m.MovieID = v.MovieID \
-          group by v.Season;",
-          function (error, rows, fields) {
-            if (error) console.log(error);
-            else {
+          "SELECT m.MovieID, v.Season AS 'Season', MAX(v.Episode) AS 'Episodes' \
+          FROM Movie m, Video v \
+          WHERE m.MovieID = v.MovieID \
+          GROUP BY v.Season;",
+          function (error, rows) {
+            if (error) {
+              console.log(error);
+              res.status(400).send();
+            } else {
               movies.forEach((element) => (element["Seasons"] = []));
 
               rows.forEach((element) => {
@@ -72,6 +76,7 @@ app.get("/movies", userMiddleware.isLoggedIn, function (req, res) {
                       : null
                   );
               });
+
               res.status(200).json(movies);
             }
           }
@@ -83,22 +88,26 @@ app.get("/movies", userMiddleware.isLoggedIn, function (req, res) {
 
 app.get("/video", userMiddleware.isLoggedIn, function (req, res) {
   const MovieID = req.query.MovieID;
+  const Season = req.query.Season;
+  const Episode = req.query.Episode;
 
-  if (MovieID != "undefined" && MovieID != "") {
-    const Season = req.query.Season
-      ? " and v.Season = " + req.query.Season
+  if (!isNaN(MovieID)) {
+    const SeasonString = Season
+      ? " AND v.Season = " + connection.escape(Season)
       : "";
-    const Episode = req.query.Episode
-      ? " and v.Episode = " + req.query.Episode
+    const EpisodeString = Episode
+      ? " AND v.Episode = " + connection.escape(Episode)
       : "";
 
-    const sql = `select v.Path from Video v where v.MovieID = ${
-      MovieID + Season + Episode
+    const sql = `SELECT v.Path FROM Video v WHERE v.MovieID = ${
+      connection.escape(MovieID) + SeasonString + EpisodeString
     };`;
 
-    connection.query(sql, function (error, rows, fields) {
-      if (error) console.log(error);
-      else {
+    connection.query(sql, function (error, rows) {
+      if (error) {
+        console.log(error);
+        res.status(400).send();
+      } else {
         if (rows[0] != null) {
           const path = DEFAULT_PATH + rows[0].Path;
 
@@ -143,11 +152,20 @@ app.get("/video", userMiddleware.isLoggedIn, function (req, res) {
               res.writeHead(200, head);
               fs.createReadStream(path).pipe(res);
             }
-          } else res.status(500).send("Can't find video");
-        } else res.status(400).send("Invalid ID");
+          } else
+            res.status(500).json({
+              msg: "Can't find video",
+            });
+        } else
+          res.status(400).json({
+            msg: "Invalid ID",
+          });
       }
     });
-  } else res.status(500).send("Enter movie ID");
+  } else
+    res.status(500).json({
+      msg: "Enter movie ID",
+    });
 });
 
 app.get("/image", function (req, res) {
@@ -156,10 +174,12 @@ app.get("/image", function (req, res) {
 
   if (new Set(["Poster", "Backdrop"]).has(Type)) {
     connection.query(
-      `select ${Type} from Movie where MovieID = ${MovieID}`,
-      function (error, rows, fields) {
-        if (error) console.log(error);
-        else {
+      `SELECT ${Type} FROM Movie WHERE MovieID = ${connection.escape(MovieID)}`,
+      function (error, rows) {
+        if (error) {
+          console.log(error);
+          res.status(400).send();
+        } else {
           if (rows[0] != null) {
             const picPath = DEFAULT_PATH + rows[0][Type];
 
@@ -169,23 +189,35 @@ app.get("/image", function (req, res) {
               };
               res.writeHead(200, head);
               fs.createReadStream(picPath).pipe(res);
-            } else res.status(500).send("Can't find image");
-          } else res.status(400).send("Invalid ID");
+            } else
+              res.status(500).json({
+                msg: "Can't find image",
+              });
+          } else
+            res.status(400).json({
+              msg: "Invalid ID",
+            });
         }
       }
     );
-  } else res.status(400).send("Invalid Type");
+  } else
+    res.status(400).json({
+      msg: "Invalid Type",
+    });
 });
 
+//// Favorites
+//
 app.get("/favorites", userMiddleware.isLoggedIn, function (req, res) {
   const UserID = req.userData.userId;
+
   connection.query(
-    `select * from Favorite where UserID = ${UserID};`,
-    function (error, rows, fields) {
-      if (error) console.log(error);
-      else {
-        res.status(200).json(rows.filter((x) => x.isValid == true));
-      }
+    `SELECT * FROM Favorite WHERE UserID = ${connection.escape(UserID)};`,
+    function (error, rows) {
+      if (error) {
+        console.log(error);
+        res.status(400).send();
+      } else res.status(200).json(rows.filter((x) => x.isValid == true));
     }
   );
 });
@@ -196,39 +228,43 @@ app.post("/favorite", userMiddleware.isLoggedIn, function (req, res) {
   const isValid = req.query.isValid;
 
   connection.query(
-    `select * from Favorite where UserID = ${UserID} and MovieID = ${MovieID}`,
-    function (error, rows, fields) {
-      if (error) console.log(error);
-      else {
+    `SELECT * FROM Favorite WHERE MovieID = ${connection.escape(MovieID)} \
+      AND UserID = ${connection.escape(UserID)}`,
+    function (error, rows) {
+      if (error) {
+        console.log(error);
+        res.status(400).send();
+      } else {
         if (rows[0] == null) {
           connection.query(
             `INSERT INTO Favorite (MovieID, UserID, isValid) VALUES \
-              (${MovieID}, ${UserID}, ${isValid})`,
-            (err, result) => {
+              (${connection.escape(MovieID)}, 
+              ${connection.escape(UserID)}, 
+              ${isValid})`,
+            (err) => {
               if (err) {
-                return res.status(400).send({
-                  msg: err,
+                console.log(err);
+                res.status(400).send();
+              } else
+                res.status(201).json({
+                  msg: "OK",
                 });
-              }
-              return res.status(201).send({
-                msg: "OK",
-              });
             }
           );
         } else {
           connection.query(
-            `UPDATE Favorite
-            SET isValid = ${isValid}
-            WHERE MovieID = ${MovieID} and ${UserID}`,
-            (err, result) => {
+            `UPDATE Favorite \
+            SET isValid = ${isValid} \
+            WHERE MovieID = ${connection.escape(MovieID)} \
+              AND UserID = ${connection.escape(UserID)}`,
+            (err) => {
               if (err) {
-                return res.status(400).send({
-                  msg: err,
+                console.log(err);
+                res.status(400).send();
+              } else
+                res.status(201).json({
+                  msg: "OK",
                 });
-              }
-              return res.status(201).send({
-                msg: "OK",
-              });
             }
           );
         }
@@ -236,57 +272,129 @@ app.post("/favorite", userMiddleware.isLoggedIn, function (req, res) {
     }
   );
 });
+//
+////
 
-app.get("/types_genres", function (req, res) {
-  let info = {};
-
-  connection.query(
-    "select Name as 'Type' from Type;",
-    function (error, rows, fields) {
-      if (error) console.log(error);
-      else {
-        info.Types = Object.keys(rows).map((key) => rows[key].Type);
-      }
-    }
-  );
+//// History
+//
+app.get("/history", userMiddleware.isLoggedIn, function (req, res) {
+  const UserID = req.userData.userId;
 
   connection.query(
-    "select Name as 'Genre' from Genre;",
-    function (error, rows, fields) {
-      if (error) console.log(error);
-      else {
-        info.Genres = Object.keys(rows).map((key) => rows[key].Genre);
-      }
-      res.status(200).json(info);
+    `SELECT * FROM History WHERE UserID = ${connection.escape(UserID)};`,
+    function (error, rows) {
+      if (error) {
+        console.log(error);
+        res.status(400).send();
+      } else res.status(200).json(rows);
     }
   );
 });
 
-// Authentication
+app.post("/addToHistory", userMiddleware.isLoggedIn, function (req, res) {
+  const UserID = req.userData.userId;
+  const MovieID = req.query.MovieID;
 
-app.post("/signin", (req, res, next) => {
+  connection.query(
+    `SELECT * FROM History WHERE UserID = ${connection.escape(UserID)}`,
+    function (error, rows) {
+      if (error) {
+        console.log(error);
+        res.status(400).send();
+      } else if (!rows.find((el) => el.MovieID == MovieID)) {
+        connection.query(
+          `INSERT INTO History (UserID, MovieID, Date) VALUES \
+            (${connection.escape(UserID)}, 
+            ${connection.escape(MovieID)}, 
+            ${connection.escape(
+              new Date().toISOString().slice(0, 19).replace("T", " ")
+            )})`,
+          (err) => {
+            if (err) {
+              console.log(err);
+              res.status(400).send();
+            } else
+              res.status(201).json({
+                msg: "OK",
+              });
+          }
+        );
+      } else {
+        connection.query(
+          `UPDATE History \
+          SET Date = ${connection.escape(
+            new Date().toISOString().slice(0, 19).replace("T", " ")
+          )} \
+          WHERE UserID = ${connection.escape(UserID)} \
+            AND MovieID = ${connection.escape(MovieID)}`,
+          (err) => {
+            if (err) {
+              console.log(err);
+              res.status(400).send();
+            } else
+              res.status(201).json({
+                msg: "OK",
+              });
+          }
+        );
+      }
+    }
+  );
+});
+//
+////
+
+app.get("/types_genres", function (req, res) {
+  let info = {};
+
+  connection.query("SELECT Name AS 'Type' FROM Type;", function (error, rows) {
+    if (error) {
+      console.log(error);
+      res.status(400).send();
+    } else info.Types = Object.keys(rows).map((key) => rows[key].Type);
+  });
+
+  connection.query(
+    "SELECT Name AS 'Genre' FROM Genre;",
+    function (error, rows) {
+      if (error) {
+        console.log(error);
+        res.status(400).send();
+      } else {
+        info.Genres = Object.keys(rows).map((key) => rows[key].Genre);
+        res.status(200).json(info);
+      }
+    }
+  );
+});
+
+//// Authentication
+//
+app.post("/signin", (req, res) => {
   connection.query(
     `SELECT * FROM User WHERE Email = ${connection.escape(req.body.email)};`,
     (err, result) => {
       if (err) {
-        return res.status(400).send({
-          msg: err,
-        });
+        console.log(err);
+        res.status(400).send();
       }
+
       if (!result.length) {
-        return res.status(401).send({
+        res.status(401).json({
           msg: "Username or password is incorrect!",
         });
       }
+
       bcrypt.compare(
         req.body.password,
         result[0]["Password"],
         (bErr, bResult) => {
           if (bErr) {
-            return res.status(401).send({
+            res.status(401).json({
               msg: "Username or password is incorrect!",
             });
           }
+
           if (bResult) {
             const token = jwt.sign(
               {
@@ -299,21 +407,21 @@ app.post("/signin", (req, res, next) => {
               }
             );
             delete result[0].Password;
-            return res.status(200).send({
+            res.status(200).json({
               msg: "Logged in!",
               user: { token, ...result[0] },
             });
-          }
-          return res.status(401).send({
-            msg: "Username or password is incorrect!",
-          });
+          } else
+            res.status(401).json({
+              msg: "Username or password is incorrect!",
+            });
         }
       );
     }
   );
 });
 
-app.post("/signup", userMiddleware.validateRegister, function (req, res, next) {
+app.post("/signup", userMiddleware.validateRegister, function (req, res) {
   const email = req.body.email;
   const firstname = req.body.firstname;
   const middlename = req.body.middlename;
@@ -326,13 +434,14 @@ app.post("/signup", userMiddleware.validateRegister, function (req, res, next) {
     )});`,
     (err, result) => {
       if (result.length) {
-        return res.status(409).send({
+        res.status(409).json({
           msg: "This username is already in use!",
         });
       } else {
         bcrypt.hash(password, 10, (err, hash) => {
           if (err) {
-            return res.status(500).send({
+            console.log(err);
+            res.status(500).json({
               msg: err,
             });
           } else {
@@ -344,15 +453,16 @@ app.post("/signup", userMiddleware.validateRegister, function (req, res, next) {
               ${middlename ? connection.escape(middlename) + "," : ""} \
               ${connection.escape(surname)}, \
               ${connection.escape(hash)})`,
-              (err, result) => {
+              (err) => {
                 if (err) {
-                  return res.status(400).send({
+                  console.log(err);
+                  res.status(400).json({
                     msg: err,
                   });
-                }
-                return res.status(201).send({
-                  msg: "Registered!",
-                });
+                } else
+                  res.status(201).json({
+                    msg: "Registered!",
+                  });
               }
             );
           }
@@ -361,3 +471,5 @@ app.post("/signup", userMiddleware.validateRegister, function (req, res, next) {
     }
   );
 });
+//
+////

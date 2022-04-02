@@ -110,7 +110,7 @@ const Home = ({ navigation }) => {
     const fetchData = async () => {
       const mvs = await getMovies(token);
 
-      if (mvs !== "Error") {
+      if (mvs !== "Not authorized") {
         const filtered = mvs.filter((el) => parseFloat(el.rating) >= 8.7);
 
         setMovies([{ key: "empty-left" }, ...filtered, { key: "empty-right" }]);

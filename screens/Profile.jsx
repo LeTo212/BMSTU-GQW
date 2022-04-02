@@ -1,48 +1,20 @@
 import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-  FlatList,
-  RefreshControl,
-} from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import Loading from "../components/Loading";
+import Feather from "react-native-vector-icons/Feather";
 
-import { getMovies, getFavorites } from "../api";
+import Loading from "../components/Loading";
 import AuthContext from "../constants/context";
 import Card from "../components/Card";
-import MovieListItem from "../components/MovieListItem";
 
 const source = require("../assets/userIcon.png");
 
-const wait = (timeout) =>
-  new Promise((resolve) => {
-    setTimeout(resolve, timeout);
-  });
-
 const Profile = ({ navigation }) => {
   const [user, setUser] = useState();
-  const [movies, setMovies] = useState([]);
-  const [userFavorites, setUserFavorites] = useState([]);
   const [token, setToken] = useState();
   const { getToken } = React.useContext(AuthContext);
   const { getUser, signOut } = React.useContext(AuthContext);
-  const [refreshing, setRefreshing] = React.useState(false);
-
-  const fetchData = async () => {
-    const favorites = await getFavorites(token);
-    if (favorites != null) setUserFavorites(favorites);
-  };
-
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    fetchData();
-    wait(2000).then(() => setRefreshing(false));
-  }, [userFavorites]);
 
   useEffect(() => {
     getToken().then((data) => {
@@ -57,24 +29,9 @@ const Profile = ({ navigation }) => {
     getUser().then((data) => {
       setUser(data);
     });
+  }, [token]);
 
-    const fetchMovies = async () => {
-      const mvs = await getMovies(token);
-      if (mvs !== "Error") {
-        setMovies(mvs);
-      } else signOut();
-    };
-
-    if (userFavorites.length === 0 && token) {
-      fetchData();
-    }
-
-    if (movies.length === 0 && token) {
-      fetchMovies();
-    }
-  }, [movies, token]);
-
-  if (movies.length === 0 || !token || !user) {
+  if (!token || !user) {
     return <Loading />;
   }
 
@@ -114,36 +71,39 @@ const Profile = ({ navigation }) => {
         </View>
       </Card>
 
-      <View style={{ margin: "5%", borderBottomWidth: 1, marginBottom: 0 }}>
+      <View style={{ margin: "5%", borderBottomWidth: 1 }}>
         <Text
           style={{ fontSize: 20, fontWeight: "800", paddingVertical: "1%" }}
         >
-          Избранное
+          Разделы
         </Text>
       </View>
 
-      <FlatList
-        style={{ width: "100%", height: "100%" }}
-        contentContainerStyle={{ alignItems: "center", paddingTop: "5%" }}
-        data={movies.filter((x) =>
-          userFavorites
-            ? userFavorites.find((el) => el.MovieID === x.key)
-            : null
-        )}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        renderItem={(movie) => (
-          <TouchableOpacity
-            activeOpacity={0.4}
-            onPress={() =>
-              navigation.navigate("Movie", { token, movie: movie.item })
-            }
-          >
-            <MovieListItem key={movie.key} movie={movie.item} />
-          </TouchableOpacity>
-        )}
-      />
+      <TouchableOpacity
+        onPress={() => navigation.navigate("Favorites")}
+        style={{
+          margin: "5%",
+          marginTop: 0,
+        }}
+      >
+        <Card style={styles.button}>
+          <Text style={styles.buttonText}>Избранное</Text>
+          <Feather name="chevron-right" size={25} />
+        </Card>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => navigation.navigate("History")}
+        style={{
+          margin: "5%",
+          marginTop: 0,
+        }}
+      >
+        <Card style={styles.button}>
+          <Text style={styles.buttonText}>История</Text>
+          <Feather name="chevron-right" size={25} />
+        </Card>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -173,6 +133,16 @@ const styles = StyleSheet.create({
     padding: "5%",
     alignItems: "flex-end",
     justifyContent: "flex-end",
+  },
+  button: {
+    padding: "3%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  buttonText: {
+    fontSize: 20,
+    fontWeight: "500",
   },
 });
 

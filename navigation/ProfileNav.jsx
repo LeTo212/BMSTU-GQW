@@ -2,8 +2,8 @@ import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import Profile from "../screens/Profile";
-import MoviePage from "../screens/MoviePage";
-import Colors from "../constants/colors";
+import FavoritesNav from "./FavoritesNav";
+import HistoryNav from "./HistoryNav";
 
 const Stack = createStackNavigator();
 
@@ -18,13 +18,19 @@ const ProfileNav = () => (
       }}
     />
     <Stack.Screen
-      name="Movie"
-      component={MoviePage}
+      name="Favorites"
+      component={FavoritesNav}
       options={{
-        title: "",
-        headerStyle: {
-          backgroundColor: Colors.primary,
-        },
+        title: "Избранное",
+        headerShown: false,
+      }}
+    />
+    <Stack.Screen
+      name="History"
+      component={HistoryNav}
+      options={{
+        title: "История",
+        headerShown: false,
       }}
     />
   </Stack.Navigator>

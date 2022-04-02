@@ -23,13 +23,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 /* eslint import/no-extraneous-dependencies: "off" */
 import * as Font from "expo-font";
 
-// Screens
+//// Screens
+//
 import AuthNav from "./navigation/AuthNav";
 import HomeNav from "./navigation/HomeNav";
 import SearchNav from "./navigation/SearchNav";
 import ProfileNav from "./navigation/ProfileNav";
 import Help from "./screens/Help";
 //
+////
 
 import AuthContext from "./constants/context";
 import Loading from "./components/Loading";

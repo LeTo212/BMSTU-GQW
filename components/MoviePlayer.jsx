@@ -9,7 +9,7 @@ import Card from "./Card";
 
 const { width, height } = Dimensions.get("window");
 
-const MoviePlayer = ({ uri }) => {
+const MoviePlayer = ({ uri, playbackCallback }) => {
   const [fullscreen, setFullscreen] = useState(false);
 
   const video = () => (
@@ -33,6 +33,7 @@ const MoviePlayer = ({ uri }) => {
         setFullscreen(true);
       }}
       showControlsOnLoad
+      playbackCallback={(status) => playbackCallback(status)}
       width={fullscreen ? styles.fullscreenVideo.width : styles.video.width}
       height={fullscreen ? styles.fullscreenVideo.height : styles.video.height}
       videoBackground="#000"
@@ -59,6 +60,11 @@ const MoviePlayer = ({ uri }) => {
 
 MoviePlayer.propTypes = {
   uri: PropTypes.objectOf(PropTypes.any).isRequired,
+  playbackCallback: PropTypes.func,
+};
+
+MoviePlayer.defaultProps = {
+  playbackCallback: () => {},
 };
 
 const styles = StyleSheet.create({

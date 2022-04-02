@@ -14,7 +14,10 @@ const Help = () => (
       showsVerticalScrollIndicator={false}
     >
       <Text style={styles.title}>Справка</Text>
-      <Text style={[styles.title, { fontSize: 20, fontWeight: "400" }]}>
+
+      {/* TODO: Change info */}
+
+      {/* <Text style={[styles.title, { fontSize: 20, fontWeight: "400" }]}>
         Главный экран
       </Text>
       <Text style={styles.text}>
@@ -42,7 +45,7 @@ const Help = () => (
         &quot;Избранные&quot; требуется зайти в подробное описание фильма и
         нажать на кнопку &quot;Добавить в избранное&quot;. Для выхода из
         аккаунат достаточно нажать кнопку &quot;Выход&quot;.
-      </Text>
+      </Text> */}
     </ScrollView>
   </SafeAreaView>
 );
