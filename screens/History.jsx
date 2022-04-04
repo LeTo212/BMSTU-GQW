@@ -5,6 +5,7 @@ import { getMovies, getHistory } from "../api";
 import Loading from "../components/Loading";
 import NotFound from "../components/NotFound";
 import MovieListItem from "../components/MovieListItem";
+import Colors from "../constants/colors";
 
 const wait = (timeout) =>
   new Promise((resolve) => {
@@ -76,7 +77,12 @@ const History = ({ navigation }) => {
         return tmp;
       })()}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor={Colors.primary}
+          colors={[Colors.primary, Colors.secondary]}
+        />
       }
       renderItem={(movie) => (
         <TouchableOpacity

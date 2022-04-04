@@ -13,7 +13,6 @@ const ProfileNav = () => (
       name="Profile"
       component={Profile}
       options={{
-        title: "Профиль",
         headerShown: false,
       }}
     />
@@ -21,7 +20,6 @@ const ProfileNav = () => (
       name="Favorites"
       component={FavoritesNav}
       options={{
-        title: "Избранное",
         headerShown: false,
       }}
     />
@@ -29,7 +27,6 @@ const ProfileNav = () => (
       name="History"
       component={HistoryNav}
       options={{
-        title: "История",
         headerShown: false,
       }}
     />

@@ -14,6 +14,7 @@ const HistoryNav = () => (
       component={History}
       options={{
         title: "История",
+        headerTintColor: "#000",
         headerStyle: {
           backgroundColor: Colors.primary,
         },
@@ -24,6 +25,7 @@ const HistoryNav = () => (
       component={MoviePage}
       options={{
         title: "",
+        headerTintColor: "#000",
         headerStyle: {
           backgroundColor: Colors.primary,
         },

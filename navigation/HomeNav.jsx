@@ -22,6 +22,7 @@ const HomeNav = () => (
       component={MoviePage}
       options={{
         title: "",
+        headerTintColor: "#000",
         headerStyle: {
           backgroundColor: Colors.primary,
         },

@@ -14,6 +14,7 @@ const FavoritesNav = () => (
       component={Favorites}
       options={{
         title: "Избранное",
+        headerTintColor: "#000",
         headerStyle: {
           backgroundColor: Colors.primary,
         },
@@ -24,6 +25,7 @@ const FavoritesNav = () => (
       component={MoviePage}
       options={{
         title: "",
+        headerTintColor: "#000",
         headerStyle: {
           backgroundColor: Colors.primary,
         },

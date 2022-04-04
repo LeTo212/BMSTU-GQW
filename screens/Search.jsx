@@ -13,11 +13,14 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { debounce } from "lodash";
+import Fuse from "fuse.js";
 
 import { getMovies, getTypesAndGenres } from "../api";
 import AuthContext from "../constants/context";
+import moviesSearchConfig from "../constants/moviesSearchConfig";
 import Loading from "../components/Loading";
 import MovieListItem from "../components/MovieListItem";
+import NotFound from "../components/NotFound";
 import Colors from "../constants/colors";
 
 const { width, height } = Dimensions.get("window");
@@ -29,8 +32,8 @@ const Search = ({ navigation }) => {
   const [list, setList] = useState({});
   const [type, setType] = useState("");
   const [genre, setGenre] = useState("");
-  const [filteredMovies, setFilteredMovies] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResult, setSearchResult] = useState([]);
 
   useEffect(() => {
     getToken().then((data) => {
@@ -50,7 +53,7 @@ const Search = ({ navigation }) => {
 
         setMovies(mvs);
         setList(lst);
-        setFilteredMovies(mvs);
+        setSearchResult(mvs);
       } else signOut();
     };
 
@@ -69,17 +72,20 @@ const Search = ({ navigation }) => {
   );
 
   const onChangeSearch = (query, filterType, filterGenre) => {
-    if (query.length === 0 && filterType === "" && filterGenre === "") {
-      setFilteredMovies(movies);
-    } else {
-      const lst = movies.filter(
-        (movie) =>
-          movie.title.toLowerCase().includes(query.toLowerCase()) &&
-          movie.type.includes(filterType) &&
-          (filterGenre === "" ? true : movie.genres.includes(filterGenre))
-      );
+    const filteredMovies = movies.filter(
+      (movie) =>
+        movie.type.includes(filterType) &&
+        (filterGenre === "" ? true : movie.genres.includes(filterGenre))
+    );
 
-      setFilteredMovies(lst);
+    if (query.length === 0) {
+      setSearchResult(filteredMovies);
+    } else {
+      setSearchResult(
+        new Fuse(filteredMovies, moviesSearchConfig)
+          .search(query)
+          .map((mv) => mv.item)
+      );
     }
   };
 
@@ -158,7 +164,7 @@ const Search = ({ navigation }) => {
       <FlatList
         style={{ width: "100%", height: "100%" }}
         contentContainerStyle={{ alignItems: "center", paddingTop: "5%" }}
-        data={filteredMovies}
+        data={searchResult}
         renderItem={(movie) => (
           <TouchableOpacity
             activeOpacity={0.4}
@@ -169,6 +175,7 @@ const Search = ({ navigation }) => {
             <MovieListItem key={movie.key} movie={movie.item} />
           </TouchableOpacity>
         )}
+        ListEmptyComponent={() => <NotFound>Not Found</NotFound>}
       />
     </SafeAreaView>
   );
@@ -176,8 +183,8 @@ const Search = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   screen: {
-    flex: 1,
-    alignItems: "center",
+    height,
+    width,
   },
   searchbarAndroid: {
     marginTop: "3%",
