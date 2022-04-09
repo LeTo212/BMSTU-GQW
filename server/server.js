@@ -237,10 +237,13 @@ app.post("/favorite", userMiddleware.isLoggedIn, function (req, res) {
       } else {
         if (rows[0] == null) {
           connection.query(
-            `INSERT INTO Favorite (MovieID, UserID, isValid) VALUES \
+            `INSERT INTO Favorite (MovieID, UserID, isValid, Date) VALUES \
               (${connection.escape(MovieID)}, 
               ${connection.escape(UserID)}, 
-              ${isValid})`,
+              ${isValid},
+              ${connection.escape(
+                new Date().toISOString().slice(0, 19).replace("T", " ")
+              )})`,
             (err) => {
               if (err) {
                 console.log(err);
@@ -252,9 +255,16 @@ app.post("/favorite", userMiddleware.isLoggedIn, function (req, res) {
             }
           );
         } else {
+          const updateDate = isValid
+            ? ", Date = " +
+              connection.escape(
+                new Date().toISOString().slice(0, 19).replace("T", " ")
+              )
+            : null;
+
           connection.query(
             `UPDATE Favorite \
-            SET isValid = ${isValid} \
+            SET isValid = ${isValid} ${updateDate} \
             WHERE MovieID = ${connection.escape(MovieID)} \
               AND UserID = ${connection.escape(UserID)}`,
             (err) => {

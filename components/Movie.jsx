@@ -25,7 +25,7 @@ const pickerStyle = {
   inputAndroid: {
     color: "black",
     width: 80,
-    height: 30,
+    height: 60,
     fontWeight: "400",
   },
 };

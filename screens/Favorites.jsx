@@ -23,7 +23,9 @@ const Favorites = ({ navigation }) => {
   const fetchData = async () => {
     const favorites = await getFavorites(token);
     if (favorites !== "Not authorized") {
-      setUserFavorites(favorites);
+      setUserFavorites(
+        favorites.sort((a, b) => new Date(b.Date) - new Date(a.Date))
+      );
     } else signOut();
   };
 
@@ -67,9 +69,13 @@ const Favorites = ({ navigation }) => {
     <FlatList
       style={{ width: "100%", height: "100%" }}
       contentContainerStyle={{ alignItems: "center", paddingTop: "5%" }}
-      data={movies.filter((x) =>
-        userFavorites ? userFavorites.find((el) => el.MovieID === x.key) : null
-      )}
+      data={(() => {
+        const tmp = [];
+        userFavorites.forEach((el) =>
+          movies.find((x) => (el.MovieID === x.key ? tmp.push(x) : null))
+        );
+        return tmp;
+      })()}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}

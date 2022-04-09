@@ -183,8 +183,7 @@ const Search = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   screen: {
-    height,
-    width,
+    flex: Platform.OS === "android" ? 1 : 0,
   },
   searchbarAndroid: {
     marginTop: "3%",

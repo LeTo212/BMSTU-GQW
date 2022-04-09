@@ -13,6 +13,7 @@ const ProfileNav = () => (
       name="Profile"
       component={Profile}
       options={{
+        title: "Профиль",
         headerShown: false,
       }}
     />
