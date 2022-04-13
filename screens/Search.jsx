@@ -161,29 +161,31 @@ const Search = ({ navigation }) => {
         </View>
       </View>
 
-      <FlatList
-        style={{ width: "100%", height: "100%" }}
-        contentContainerStyle={{ alignItems: "center", paddingTop: "5%" }}
-        data={searchResult}
-        renderItem={(movie) => (
-          <TouchableOpacity
-            activeOpacity={0.4}
-            onPress={() =>
-              navigation.navigate("Movie", { token, movie: movie.item })
-            }
-          >
-            <MovieListItem key={movie.key} movie={movie.item} />
-          </TouchableOpacity>
-        )}
-        ListEmptyComponent={() => <NotFound>Not Found</NotFound>}
-      />
+      <View style={{ width: "100%", height: "100%" }}>
+        <FlatList
+          contentContainerStyle={{ alignItems: "center", paddingTop: "5%" }}
+          data={searchResult}
+          renderItem={(movie) => (
+            <TouchableOpacity
+              activeOpacity={0.4}
+              onPress={() =>
+                navigation.navigate("Movie", { token, movie: movie.item })
+              }
+            >
+              <MovieListItem key={movie.key} movie={movie.item} />
+            </TouchableOpacity>
+          )}
+          ListEmptyComponent={() => <NotFound>Not Found</NotFound>}
+        />
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   screen: {
-    flex: Platform.OS === "android" ? 1 : 0,
+    flex: 1,
+    backgroundColor: Colors.background,
   },
   searchbarAndroid: {
     marginTop: "3%",

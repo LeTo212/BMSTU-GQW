@@ -7,6 +7,7 @@ import Feather from "react-native-vector-icons/Feather";
 import Loading from "../components/Loading";
 import AuthContext from "../constants/context";
 import Card from "../components/Card";
+import Colors from "../constants/colors";
 
 const source = require("../assets/userIcon.png");
 
@@ -36,7 +37,7 @@ const Profile = ({ navigation }) => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={styles.screen}>
       <Card style={styles.profile}>
         <Image
           source={source}
@@ -109,6 +110,10 @@ const Profile = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
   profile: {
     height: 200,
     marginVertical: "2%",

@@ -111,7 +111,10 @@ const Home = ({ navigation }) => {
       const mvs = await getMovies(token);
 
       if (mvs !== "Not authorized") {
-        const filtered = mvs.filter((el) => parseFloat(el.rating) >= 8.7);
+        const filtered = mvs
+          .sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate))
+          .slice(0, 10)
+          .sort((a, b) => b.rating - a.rating);
 
         setMovies([{ key: "empty-left" }, ...filtered, { key: "empty-right" }]);
         setCurrentMovie(filtered[0]);

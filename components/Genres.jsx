@@ -30,7 +30,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderColor: "#ccc",
     marginRight: 4,
-    marginBottom: 4,
   },
   genreText: {
     fontSize: 9,

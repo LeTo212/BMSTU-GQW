@@ -121,98 +121,71 @@ const SignIn = ({ navigation }) => {
     >
       <StatusBar backgroundColor={Colors.primary} barStyle="light-content" />
       <View style={styles.header}>
-        <Text style={styles.text_header}>Добро пожаловать!</Text>
+        <Text style={styles.textHeader}>Добро пожаловать!</Text>
       </View>
-      <Animatable.View
-        animation="fadeInUpBig"
-        style={[
-          styles.footer,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
-      >
-        <Text
-          style={[
-            styles.text_footer,
-            {
-              color: colors.text,
-            },
-          ]}
-        >
-          Почта
-        </Text>
-        <View style={styles.action}>
-          <FontAwesome name="envelope-o" color={colors.text} size={20} />
-          <TextInput
-            placeholder="Введите почту"
-            placeholderTextColor="#666666"
-            style={[
-              styles.textInput,
-              {
-                color: colors.text,
-              },
-            ]}
-            autoCapitalize="none"
-            onChangeText={(val) => textInputChange(val)}
-            onEndEditing={(e) => handleValidUser(e.nativeEvent.text)}
-          />
-          {data.check_textInputChange ? (
-            <Animatable.View animation="bounceIn">
-              <Feather name="check-circle" color="green" size={20} />
+      <Animatable.View animation="fadeInUpBig" style={styles.footer}>
+        <View>
+          <Text style={styles.textFooter}>Почта</Text>
+          <View style={styles.action}>
+            <FontAwesome name="envelope-o" size={20} />
+            <TextInput
+              placeholder="Введите почту"
+              placeholderTextColor="#666666"
+              maxLength={60}
+              style={styles.textInput}
+              autoCapitalize="none"
+              onChangeText={(val) => textInputChange(val)}
+              onEndEditing={(e) => handleValidUser(e.nativeEvent.text)}
+            />
+            {data.check_textInputChange ? (
+              <Animatable.View animation="bounceIn">
+                <Feather name="check-circle" color="green" size={20} />
+              </Animatable.View>
+            ) : null}
+          </View>
+          {data.isValidUser ? null : (
+            <Animatable.View animation="fadeInLeft" duration={500}>
+              <Text style={styles.errorMsg}>
+                Почта должна быть не менее 4 символов.
+              </Text>
             </Animatable.View>
-          ) : null}
+          )}
         </View>
-        {data.isValidUser ? null : (
-          <Animatable.View animation="fadeInLeft" duration={500}>
-            <Text style={styles.errorMsg}>
-              Почта должна быть не менее 4 символов.
-            </Text>
-          </Animatable.View>
-        )}
 
-        <Text
-          style={[
-            styles.text_footer,
-            {
-              color: colors.text,
-              marginTop: 35,
-            },
-          ]}
+        <View
+          style={{
+            marginTop: 35,
+          }}
         >
-          Пароль
-        </Text>
-        <View style={styles.action}>
-          <Feather name="lock" color={colors.text} size={20} />
-          <TextInput
-            placeholder="Введите пароль"
-            placeholderTextColor="#666666"
-            secureTextEntry={!!data.secureTextEntry}
-            style={[
-              styles.textInput,
-              {
-                color: colors.text,
-              },
-            ]}
-            autoCapitalize="none"
-            onChangeText={(val) => handlePasswordChange(val)}
-            value={data.password}
-          />
-          <TouchableOpacity onPress={updateSecureTextEntry}>
-            {data.secureTextEntry ? (
-              <Feather name="eye-off" color="grey" size={20} />
-            ) : (
-              <Feather name="eye" color="grey" size={20} />
-            )}
-          </TouchableOpacity>
+          <Text style={styles.textFooter}>Пароль</Text>
+          <View style={styles.action}>
+            <Feather name="lock" color={colors.text} size={20} />
+            <TextInput
+              placeholder="Введите пароль"
+              placeholderTextColor="#666666"
+              maxLength={200}
+              secureTextEntry={!!data.secureTextEntry}
+              style={styles.textInput}
+              autoCapitalize="none"
+              onChangeText={(val) => handlePasswordChange(val)}
+              value={data.password}
+            />
+            <TouchableOpacity onPress={updateSecureTextEntry}>
+              {data.secureTextEntry ? (
+                <Feather name="eye-off" color="grey" size={20} />
+              ) : (
+                <Feather name="eye" color="grey" size={20} />
+              )}
+            </TouchableOpacity>
+          </View>
+          {data.isValidPassword ? null : (
+            <Animatable.View animation="fadeInLeft" duration={500}>
+              <Text style={styles.errorMsg}>
+                Пароль должен быть не менее 8 символов
+              </Text>
+            </Animatable.View>
+          )}
         </View>
-        {data.isValidPassword ? null : (
-          <Animatable.View animation="fadeInLeft" duration={500}>
-            <Text style={styles.errorMsg}>
-              Пароль должен быть не менее 8 символов
-            </Text>
-          </Animatable.View>
-        )}
 
         <TouchableOpacity>
           <Text style={{ color: Colors.primary, marginTop: 15 }}>
@@ -234,7 +207,7 @@ const SignIn = ({ navigation }) => {
                 style={[
                   styles.textSign,
                   {
-                    color: "#fff",
+                    color: Colors.background,
                   },
                 ]}
               >
@@ -286,18 +259,18 @@ const styles = StyleSheet.create({
   },
   footer: {
     flex: 3,
-    backgroundColor: "#fff",
+    backgroundColor: Colors.background,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingHorizontal: 20,
     paddingVertical: 30,
   },
-  text_header: {
+  textHeader: {
     color: "#fff",
     fontWeight: "bold",
     fontSize: 30,
   },
-  text_footer: {
+  textFooter: {
     color: "#05375a",
     fontSize: 18,
   },

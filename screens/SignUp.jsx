@@ -238,6 +238,7 @@ const SignUp = ({ navigation }) => {
             <TextInput
               placeholder="Введите почту"
               style={styles.textInput}
+              maxLength={60}
               autoCapitalize="none"
               onChangeText={(val) => textInputChange(val)}
               onEndEditing={(e) => handleValidUser(e.nativeEvent.text)}
@@ -271,6 +272,7 @@ const SignUp = ({ navigation }) => {
             <TextInput
               placeholder="Введите имя"
               style={styles.textInput}
+              maxLength={60}
               autoCapitalize="none"
               onChangeText={(val) => handleFirstnameChange(val)}
             />
@@ -296,6 +298,7 @@ const SignUp = ({ navigation }) => {
             <TextInput
               placeholder="Введите отчество"
               style={styles.textInput}
+              maxLength={60}
               autoCapitalize="none"
               onChangeText={(val) => handleMiddlenameChange(val)}
             />
@@ -321,6 +324,7 @@ const SignUp = ({ navigation }) => {
             <TextInput
               placeholder="Введите фамилию"
               style={styles.textInput}
+              maxLength={60}
               autoCapitalize="none"
               onChangeText={(val) => handleSurnameChange(val)}
             />
@@ -347,6 +351,7 @@ const SignUp = ({ navigation }) => {
               placeholder="Введите пароль"
               secureTextEntry={!!data.secureTextEntry}
               style={styles.textInput}
+              maxLength={200}
               autoCapitalize="none"
               onChangeText={(val) => handlePasswordChange(val)}
               value={data.password}
@@ -383,6 +388,7 @@ const SignUp = ({ navigation }) => {
               placeholder="Повторите пароль"
               secureTextEntry={!!data.confirm_secureTextEntry}
               style={styles.textInput}
+              maxLength={200}
               autoCapitalize="none"
               onChangeText={(val) => handleConfirmPasswordChange(val)}
               value={data.confirm_password}
@@ -478,7 +484,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     flex: Platform.OS === "ios" ? 3 : 5,
-    backgroundColor: "#fff",
+    backgroundColor: Colors.background,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingHorizontal: 20,

@@ -22,7 +22,7 @@ import { getFavorites, changeFavorite } from "../api";
 import Loading from "../components/Loading";
 
 const { width, height } = Dimensions.get("window");
-const TEXTMARGINVERTICAL = "2%";
+const TEXT_MARGIN_VERTICAL = "2%";
 const ITEM_SIZE = Platform.OS === "ios" ? width * 0.72 : width * 0.74;
 const BACKDROP_HEIGHT = height * 0.65;
 const FAVORITE_COLOR = "#DC7633";
@@ -125,26 +125,39 @@ const MoviePage = ({ route }) => {
             </Text>
           </TouchableOpacity>
 
-          <Text style={{ marginVertical: TEXTMARGINVERTICAL }}>
-            Тип: {movie.type}
+          <Text style={styles.textContainer}>
+            <Text style={styles.text}>Тип: </Text>
+            {movie.type}
           </Text>
-          <Text style={{ marginVertical: TEXTMARGINVERTICAL }}>
-            Рейтинг: <Text style={{ color: "#ff6347" }}>{movie.rating}</Text>
+
+          <Text style={styles.textContainer}>
+            <Text style={styles.text}>Рейтинг: </Text>
+            <Text style={{ color: "#ff6347" }}>{movie.rating}</Text>
           </Text>
-          <View style={{ flexDirection: "row" }}>
-            <Text style={{ marginVertical: TEXTMARGINVERTICAL }}>Жанры: </Text>
+
+          <View style={styles.textContainer}>
+            <Text style={styles.text}>Жанры: </Text>
             {movie.genres ? <Genres genres={movie.genres} /> : null}
           </View>
-          <Text style={{ marginVertical: TEXTMARGINVERTICAL }}>
-            Режисер: {movie.directors ? movie.directors.join(", ") : null}
+
+          <Text style={styles.textContainer}>
+            <Text style={styles.text}>Режисер: </Text>
+            {movie.directors ? movie.directors.join(", ") : null}
           </Text>
-          <Text style={{ marginVertical: TEXTMARGINVERTICAL }}>
-            Выпуск: {movie.releaseDate}
+
+          <Text style={styles.textContainer}>
+            <Text style={styles.text}>Выпуск: </Text>
+            {new Date(movie.releaseDate)
+              .toISOString()
+              .split("T")[0]
+              .replace(/-/g, "/")}
           </Text>
+
           <Text
-            style={{ marginVertical: TEXTMARGINVERTICAL, textAlign: "justify" }}
+            style={{ ...styles.textContainer, ...{ textAlign: "justify" } }}
           >
-            Описание: {movie.description}
+            <Text style={styles.text}>Описание: </Text>
+            {movie.description}
           </Text>
         </Card>
 
@@ -214,6 +227,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "400",
   },
+  textContainer: {
+    flexDirection: "row",
+    marginVertical: TEXT_MARGIN_VERTICAL,
+    alignItems: "center",
+  },
+  text: { fontWeight: "700" },
 });
 
 export default MoviePage;
