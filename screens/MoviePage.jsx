@@ -146,6 +146,11 @@ const MoviePage = ({ route }) => {
           </Text>
 
           <Text style={styles.textContainer}>
+            <Text style={styles.text}>Актеры: </Text>
+            {movie.directors ? movie.actors.join(", ") : null}
+          </Text>
+
+          <Text style={styles.textContainer}>
             <Text style={styles.text}>Выпуск: </Text>
             {new Date(movie.releaseDate)
               .toISOString()
@@ -153,9 +158,7 @@ const MoviePage = ({ route }) => {
               .replace(/-/g, "/")}
           </Text>
 
-          <Text
-            style={{ ...styles.textContainer, ...{ textAlign: "justify" } }}
-          >
+          <Text style={styles.textContainer}>
             <Text style={styles.text}>Описание: </Text>
             {movie.description}
           </Text>
@@ -228,9 +231,11 @@ const styles = StyleSheet.create({
     fontWeight: "400",
   },
   textContainer: {
+    width: "100%",
     flexDirection: "row",
     marginVertical: TEXT_MARGIN_VERTICAL,
     alignItems: "center",
+    textAlign: "justify",
   },
   text: { fontWeight: "700" },
 });

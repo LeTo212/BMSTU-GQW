@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const DEFAULT_PATH = "/Users/dominyk/Desktop/GCW Database";
+const DEFAULT_PATH = "/Users/dominyk/Desktop/GCW Database/Movies";
 const userMiddleware = require("./middleware/users");
 
 app.use(bodyParser.json({ type: "application/json" }));
@@ -38,11 +38,14 @@ app.get("/movies", userMiddleware.isLoggedIn, function (req, res) {
   );
   connection.query(
     "SELECT m.MovieID, m.Title, t.Name AS 'Type', GROUP_CONCAT(DISTINCT g.Name SEPARATOR ', ') AS 'Genres', \
-      GROUP_CONCAT(DISTINCT CONCAT(d.Name,' ', IFNULL(d.MiddleName,' '), d.Surname) SEPARATOR ', ') AS 'Directors', \
+      GROUP_CONCAT(DISTINCT CONCAT(d.Name,' ', IFNULL(CONCAT(d.MiddleName, ' '),''), d.Surname) SEPARATOR ', ') AS 'Directors', \
+      GROUP_CONCAT(DISTINCT CONCAT(a.Name,' ', IFNULL(CONCAT(a.MiddleName, ' '),''), a.Surname) SEPARATOR ', ') AS 'Actors', \
       m.Rating, m.Description, m.ReleaseDate \
-    FROM Movie m, Type t, Director_Movie d_m, Director d, Genre_Movie g_m, Genre g \
-    WHERE m.TypeID = t.TypeID AND d.DirectorID = d_m.DirectorID \
-      AND m.MovieID = d_m.MovieID AND g.GenreID = g_m.GenreID AND m.MovieID = g_m.MovieID \
+    FROM Movie m, Type t, Genre g, Director_Movie d_m, Director d, Genre_Movie g_m, Actor a, Actor_Movie a_m \
+    WHERE m.TypeID = t.TypeID \
+      AND g.GenreID = g_m.GenreID AND m.MovieID = g_m.MovieID \
+      AND d.DirectorID = d_m.DirectorID AND m.MovieID = d_m.MovieID \
+      AND a.ActorID = a_m.ActorID AND m.MovieID = a_m.MovieID \
     GROUP BY m.MovieID;",
     function (error, rows) {
       if (error) {
@@ -52,6 +55,7 @@ app.get("/movies", userMiddleware.isLoggedIn, function (req, res) {
         rows.forEach(function (part, index, arr) {
           arr[index].Genres = arr[index].Genres.split(", ");
           arr[index].Directors = arr[index].Directors.split(", ");
+          arr[index].Actors = arr[index].Actors.split(", ");
         });
         const movies = rows;
 

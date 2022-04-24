@@ -11,5 +11,6 @@ export default {
     "type",
     "genres",
     "directors",
+    "actors",
   ],
 };
