@@ -14,7 +14,7 @@ import { AntDesign } from "@expo/vector-icons";
 import PropTypes from "prop-types";
 
 import AuthContext from "../constants/context";
-import Movie from "../components/Movie";
+import MoviePlayerFrame from "../components/MoviePlayerFrame";
 import Genres from "../components/Genres";
 import Card from "../components/Card";
 import Colors from "../constants/colors";
@@ -37,8 +37,8 @@ const MoviePage = ({ route }) => {
     const fetchData = async () => {
       const favorites = await getFavorites(token);
 
-      if (favorites !== "Not authorized") {
-        setIsFavorite(!!favorites.find((x) => x.MovieID === movie.key));
+      if (favorites !== "Error") {
+        setIsFavorite(!!favorites.find((x) => x.key === movie.key));
       } else signOut();
     };
 
@@ -164,7 +164,7 @@ const MoviePage = ({ route }) => {
           </Text>
         </Card>
 
-        <Movie token={token} movieInfo={movie} />
+        <MoviePlayerFrame token={token} movieInfo={movie} />
       </View>
     </ScrollView>
   );
@@ -224,6 +224,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderLeftWidth: 1,
     borderRadius: 10,
+    zIndex: 100,
   },
   appButtonText: {
     marginLeft: "2%",

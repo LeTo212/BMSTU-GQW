@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FlatList, RefreshControl, TouchableOpacity } from "react-native";
 
-import { getMovies, getHistory } from "../api";
+import { getHistory } from "../api";
 import Loading from "../components/Loading";
 import NotFound from "../components/NotFound";
 import MovieListItem from "../components/MovieListItem";
@@ -13,19 +13,16 @@ const wait = (timeout) =>
   });
 
 const History = ({ navigation }) => {
-  const [movies, setMovies] = useState([]);
-  const [userHistory, setUserHistory] = useState([]);
+  const [userHistory, setUserHistory] = useState(null);
   const [token, setToken] = useState();
   const [refreshing, setRefreshing] = React.useState(false);
   const { getToken } = React.useContext(AuthContext);
   const { signOut } = React.useContext(AuthContext);
 
   const fetchData = async () => {
-    const history = await getHistory(token);
-    if (history !== "Not authorized") {
-      setUserHistory(
-        history.sort((a, b) => new Date(b.Date) - new Date(a.Date))
-      );
+    const hst = await getHistory(token);
+    if (hst !== "Error") {
+      setUserHistory(hst);
     } else signOut();
   };
 
@@ -45,23 +42,12 @@ const History = ({ navigation }) => {
       setToken(data);
     });
 
-    const fetchMovies = async () => {
-      const mvs = await getMovies(token);
-      if (mvs !== "Not authorized") {
-        setMovies(mvs);
-      } else signOut();
-    };
-
-    if (userHistory.length === 0 && token) {
+    if (userHistory === null && token) {
       fetchData();
     }
+  }, [token]);
 
-    if (movies.length === 0 && token) {
-      fetchMovies();
-    }
-  }, [movies, token]);
-
-  if (movies.length === 0 || !token) {
+  if (userHistory === null || !token) {
     return <Loading />;
   }
 
@@ -69,13 +55,7 @@ const History = ({ navigation }) => {
     <FlatList
       style={{ width: "100%", height: "100%" }}
       contentContainerStyle={{ alignItems: "center", paddingTop: "5%" }}
-      data={(() => {
-        const tmp = [];
-        userHistory.forEach((el) =>
-          movies.find((x) => (el.MovieID === x.key ? tmp.push(x) : null))
-        );
-        return tmp;
-      })()}
+      data={userHistory}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}

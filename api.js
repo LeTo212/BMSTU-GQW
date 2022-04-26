@@ -1,7 +1,6 @@
 import API_URL from "./constants/config";
 
-const getImagePath = (ID, Type) =>
-  `${API_URL}/image?MovieID=${ID}&Type=${Type}`;
+const getImageURL = (ID, Type) => `${API_URL}/image?MovieID=${ID}&Type=${Type}`;
 
 export const getVideoPath = (token, ID, season, episode) => {
   const ssn = season ? `&Season=${season}` : "";
@@ -15,6 +14,35 @@ export const getVideoPath = (token, ID, season, episode) => {
     },
   };
 };
+
+const editMovies = (movies) =>
+  movies.map(
+    ({
+      MovieID,
+      Title,
+      Type,
+      Genres,
+      Directors,
+      Actors,
+      Rating,
+      Description,
+      ReleaseDate,
+      Seasons,
+    }) => ({
+      key: MovieID,
+      title: Title,
+      type: Type,
+      genres: Genres,
+      actors: Actors,
+      directors: Directors,
+      rating: Rating,
+      description: Description,
+      releaseDate: ReleaseDate,
+      poster: getImageURL(MovieID, "Poster"),
+      backdrop: getImageURL(MovieID, "Backdrop"),
+      seasons: Seasons,
+    })
+  );
 
 export const getTypesAndGenres = async () => {
   const results = await fetch(`${API_URL}/types_genres`).then((x) => x.json());
@@ -46,37 +74,11 @@ export const getMovies = async (token) => {
     );
 
     if (results[0].statusCode === 200) {
-      return results[1].map(
-        ({
-          MovieID,
-          Title,
-          Type,
-          Genres,
-          Directors,
-          Actors,
-          Rating,
-          Description,
-          ReleaseDate,
-          Seasons,
-        }) => ({
-          key: MovieID,
-          title: Title,
-          type: Type,
-          genres: Genres,
-          actors: Actors,
-          directors: Directors,
-          rating: Rating,
-          description: Description,
-          releaseDate: ReleaseDate,
-          poster: getImagePath(MovieID, "Poster"),
-          backdrop: getImagePath(MovieID, "Backdrop"),
-          seasons: Seasons,
-        })
-      );
+      return editMovies(results[1]);
     }
 
-    if (results[0].statusCode === 401) {
-      return "Not authorized";
+    if (new Set([400, 401, 500]).has(results[0].statusCode)) {
+      return "Error";
     }
   }
 
@@ -103,15 +105,15 @@ export const getFavorites = async (token) => {
     );
 
     if (results[0].statusCode === 200) {
-      return results[1];
+      return editMovies(results[1]);
     }
 
-    if (results[0].statusCode === 401) {
-      return "Not authorized";
+    if (new Set([400, 401, 500]).has(results[0].statusCode)) {
+      return "Error";
     }
   }
 
-  return [];
+  return null;
 };
 
 export const changeFavorite = async (token, movieID, isValid) => {
@@ -150,15 +152,15 @@ export const getHistory = async (token) => {
     );
 
     if (results[0].statusCode === 200) {
-      return results[1];
+      return editMovies(results[1]);
     }
 
-    if (results[0].statusCode === 401) {
-      return "Not authorized";
+    if (new Set([400, 401, 500]).has(results[0].statusCode)) {
+      return "Error";
     }
   }
 
-  return [];
+  return null;
 };
 
 export const addToHistory = async (token, movieID) => {

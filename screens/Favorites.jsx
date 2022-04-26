@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FlatList, RefreshControl, TouchableOpacity } from "react-native";
 
-import { getMovies, getFavorites } from "../api";
+import { getFavorites } from "../api";
 import Loading from "../components/Loading";
 import NotFound from "../components/NotFound";
 import MovieListItem from "../components/MovieListItem";
@@ -13,19 +13,16 @@ const wait = (timeout) =>
   });
 
 const Favorites = ({ navigation }) => {
-  const [movies, setMovies] = useState([]);
-  const [userFavorites, setUserFavorites] = useState([]);
+  const [userFavorites, setUserFavorites] = useState(null);
   const [token, setToken] = useState();
   const [refreshing, setRefreshing] = React.useState(false);
   const { getToken } = React.useContext(AuthContext);
   const { signOut } = React.useContext(AuthContext);
 
   const fetchData = async () => {
-    const favorites = await getFavorites(token);
-    if (favorites !== "Not authorized") {
-      setUserFavorites(
-        favorites.sort((a, b) => new Date(b.Date) - new Date(a.Date))
-      );
+    const fvr = await getFavorites(token);
+    if (fvr !== "Error") {
+      setUserFavorites(fvr);
     } else signOut();
   };
 
@@ -45,23 +42,12 @@ const Favorites = ({ navigation }) => {
       setToken(data);
     });
 
-    const fetchMovies = async () => {
-      const mvs = await getMovies(token);
-      if (mvs !== "Not authorized") {
-        setMovies(mvs);
-      } else signOut();
-    };
-
-    if (userFavorites.length === 0 && token) {
+    if (userFavorites === null && token) {
       fetchData();
     }
+  }, [token]);
 
-    if (movies.length === 0 && token) {
-      fetchMovies();
-    }
-  }, [movies, token]);
-
-  if (movies.length === 0 || !token) {
+  if (userFavorites === null || !token) {
     return <Loading />;
   }
 
@@ -69,13 +55,7 @@ const Favorites = ({ navigation }) => {
     <FlatList
       style={{ width: "100%", height: "100%" }}
       contentContainerStyle={{ alignItems: "center", paddingTop: "5%" }}
-      data={(() => {
-        const tmp = [];
-        userFavorites.forEach((el) =>
-          movies.find((x) => (el.MovieID === x.key ? tmp.push(x) : null))
-        );
-        return tmp;
-      })()}
+      data={userFavorites}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}

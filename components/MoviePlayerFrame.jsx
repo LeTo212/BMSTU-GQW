@@ -30,7 +30,7 @@ const pickerStyle = {
   },
 };
 
-const Movie = ({ token, movieInfo }) => {
+const MoviePlayerFrame = ({ token, movieInfo }) => {
   const [season, setSeason] = useState("1");
   const [episode, setEpisode] = useState("1");
   const [seasonsList, setSeasonsList] = useState([]);
@@ -126,7 +126,7 @@ const Movie = ({ token, movieInfo }) => {
   );
 };
 
-Movie.propTypes = {
+MoviePlayerFrame.propTypes = {
   token: PropTypes.string.isRequired,
   movieInfo: PropTypes.objectOf(PropTypes.any).isRequired,
 };
@@ -144,4 +144,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Movie;
+export default MoviePlayerFrame;

@@ -1,5 +1,20 @@
 const jwt = require("jsonwebtoken");
 
+const isBoolean = (string) => {
+  switch (string.toLowerCase().trim()) {
+    case "true":
+    case "yes":
+    case "1":
+    case "false":
+    case "no":
+    case "0":
+      return true;
+
+    default:
+      return false;
+  }
+};
+
 module.exports = {
   validateRegister: (req, res, next) => {
     // username min length 4
@@ -39,5 +54,46 @@ module.exports = {
         msg: "Your session is not valid!",
       });
     }
+  },
+
+  validateVideo: (req, res, next) => {
+    if (
+      !isNaN(req.query.MovieID) &&
+      (!isNaN(req.query.Season) || req.query.Season == null) &&
+      (!isNaN(req.query.Episode) || req.query.Episode == null)
+    )
+      next();
+    else
+      res.status(400).send({
+        msg: "Invalid data!",
+      });
+  },
+
+  validateImage: (req, res, next) => {
+    if (
+      !isNaN(req.query.MovieID) &&
+      new Set(["Poster", "Backdrop"]).has(req.query.Type)
+    )
+      next();
+    else
+      res.status(400).send({
+        msg: "Invalid data!",
+      });
+  },
+
+  validateFavorite: (req, res, next) => {
+    if (!isNaN(req.query.MovieID) && isBoolean(req.query.isValid)) next();
+    else
+      res.status(400).send({
+        msg: "Invalid data!",
+      });
+  },
+
+  validateAddToHistory: (req, res, next) => {
+    if (!isNaN(req.query.MovieID)) next();
+    else
+      res.status(400).send({
+        msg: "Invalid data!",
+      });
   },
 };

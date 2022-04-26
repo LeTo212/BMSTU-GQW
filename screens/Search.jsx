@@ -48,7 +48,7 @@ const Search = ({ navigation }) => {
     const fetchData = async () => {
       const mvs = await getMovies(token);
 
-      if (mvs !== "Not authorized") {
+      if (mvs !== "Error") {
         const lst = await getTypesAndGenres();
 
         setMovies(mvs);

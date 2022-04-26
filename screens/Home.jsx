@@ -97,6 +97,20 @@ const Home = ({ navigation }) => {
   );
   const scrollX = useRef(new Animated.Value(0)).current;
 
+  const fetchData = async () => {
+    const mvs = await getMovies(token);
+
+    if (mvs !== "Error") {
+      const filtered = mvs
+        .sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate))
+        .slice(0, 10)
+        .sort((a, b) => b.rating - a.rating);
+
+      setMovies([{ key: "empty-left" }, ...filtered, { key: "empty-right" }]);
+      setCurrentMovie(filtered[0]);
+    } else signOut();
+  };
+
   useEffect(() => {
     getToken().then((data) => {
       if (!data) {
@@ -106,20 +120,6 @@ const Home = ({ navigation }) => {
 
       setToken(data);
     });
-
-    const fetchData = async () => {
-      const mvs = await getMovies(token);
-
-      if (mvs !== "Not authorized") {
-        const filtered = mvs
-          .sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate))
-          .slice(0, 10)
-          .sort((a, b) => b.rating - a.rating);
-
-        setMovies([{ key: "empty-left" }, ...filtered, { key: "empty-right" }]);
-        setCurrentMovie(filtered[0]);
-      } else signOut();
-    };
 
     if (movies.length === 0 && token) {
       fetchData();
