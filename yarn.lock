@@ -2286,6 +2286,11 @@ async-limiter@~1.0.0:
   resolved "https://registry.npmjs.org/async-limiter/-/async-limiter-1.0.1.tgz"
   integrity sha512-csOlWGAcRFJaI6m+F2WKdnMKr4HhdhFVBk0H/QbJFMCr+uO2kwohwXQPxw/9OCxp05r5ghVBFSyioixx3gfkNQ==
 
+async@*:
+  version "3.2.3"
+  resolved "https://registry.yarnpkg.com/async/-/async-3.2.3.tgz#ac53dafd3f4720ee9e8a160628f18ea91df196c9"
+  integrity sha512-spZRyzKL5l5BZQrr/6m/SqFdBN0q3OCI0f9rjfBzCMBIP4p75P620rR3gTmaksNOhmzgdxcaxdNfMy6anrbM0g==
+
 async@^2.4.0:
   version "2.6.3"
   resolved "https://registry.npmjs.org/async/-/async-2.6.3.tgz"
@@ -5013,6 +5018,13 @@ istanbul-reports@^3.0.2:
   dependencies:
     html-escaper "^2.0.0"
     istanbul-lib-report "^3.0.0"
+
+jaccard@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/jaccard/-/jaccard-0.4.0.tgz#d31c517305e9f799d2539f6ac293d8be9fb9ad57"
+  integrity sha1-0xxRcwXp95nSU59qwpPYvp+5rVc=
+  dependencies:
+    async "*"
 
 jest-changed-files@^26.6.2:
   version "26.6.2"

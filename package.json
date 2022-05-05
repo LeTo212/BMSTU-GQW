@@ -30,6 +30,7 @@
     "expo-video-player": "^1.6.1",
     "express": "^4.17.1",
     "fuse.js": "^6.5.3",
+    "jaccard": "^0.4.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "mysql2": "^2.3.3",

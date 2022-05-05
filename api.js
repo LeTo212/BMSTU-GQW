@@ -85,6 +85,37 @@ export const getMovies = async (token) => {
   return [];
 };
 
+export const getRecommendations = async (token) => {
+  if (token) {
+    const requestOptions = {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    };
+
+    const results = await fetch(
+      `${API_URL}/recommendations`,
+      requestOptions
+    ).then((x) => {
+      const statusCode = x.status;
+      const data = x.json();
+      return Promise.all([{ statusCode }, data]);
+    });
+
+    if (results[0].statusCode === 200) {
+      return editMovies(results[1]);
+    }
+
+    if (new Set([400, 401, 500]).has(results[0].statusCode)) {
+      return "Error";
+    }
+  }
+
+  return [];
+};
+
 //// Favorites
 //
 export const getFavorites = async (token) => {

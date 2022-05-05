@@ -5,8 +5,10 @@ const mysql = require("mysql2");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const jaccard = require("jaccard");
 
 const DEFAULT_PATH = "/Users/dominyk/Desktop/GCW Database/Movies";
+const authConfig = require("./authConfig");
 const userMiddleware = require("./middleware/users");
 
 app.use(bodyParser.json({ type: "application/json" }));
@@ -48,30 +50,33 @@ const getMoviesSqlScript = (mode, userID) => {
     GROUP_CONCAT(DISTINCT CONCAT(a.Name,' ', IFNULL(CONCAT(a.MiddleName, ' '),''), a.Surname) SEPARATOR ', ') AS 'Actors',
     m.Rating, m.Description, m.ReleaseDate\n`;
 
-  const getAllMovies = `FROM Movie m, Type t, Genre g, Director_Movie d_m, Director d, Genre_Movie g_m, Actor a, Actor_Movie a_m
+  const getAllMovies = `FROM Movie m, Type t, Genre g, Director_Movie d_m, Director d, Genre_Movie g_m, Actor a, Actor_Movie a_m, Video v
   WHERE m.TypeID = t.TypeID
     AND g.GenreID = g_m.GenreID AND m.MovieID = g_m.MovieID
     AND d.DirectorID = d_m.DirectorID AND m.MovieID = d_m.MovieID
     AND a.ActorID = a_m.ActorID AND m.MovieID = a_m.MovieID
+    AND m.MovieID = v.MovieID
   GROUP BY m.MovieID;\n`;
 
-  const getFavorites = `FROM Favorite f, User u, Movie m, Type t, Genre g, Director_Movie d_m, Director d, Genre_Movie g_m, Actor a, Actor_Movie a_m
+  const getFavorites = `FROM Favorite f, User u, Movie m, Type t, Genre g, Director_Movie d_m, Director d, Genre_Movie g_m, Actor a, Actor_Movie a_m, Video v
   WHERE u.UserID = ${connection.escape(userID)}
     AND u.UserID = f.UserID AND f.MovieID = m.MovieID AND isValid = 1
     AND m.TypeID = t.TypeID
     AND g.GenreID = g_m.GenreID AND m.MovieID = g_m.MovieID
     AND d.DirectorID = d_m.DirectorID AND m.MovieID = d_m.MovieID
     AND a.ActorID = a_m.ActorID AND m.MovieID = a_m.MovieID
+    AND m.MovieID = v.MovieID
   GROUP BY m.MovieID
   ORDER BY f.Date DESC;\n`;
 
-  const getHistory = `FROM History h, User u, Movie m, Type t, Genre g, Director_Movie d_m, Director d, Genre_Movie g_m, Actor a, Actor_Movie a_m
+  const getHistory = `FROM History h, User u, Movie m, Type t, Genre g, Director_Movie d_m, Director d, Genre_Movie g_m, Actor a, Actor_Movie a_m, Video v
   WHERE u.UserID = ${connection.escape(userID)}
     AND u.UserID = h.UserID AND h.MovieID = m.MovieID
     AND m.TypeID = t.TypeID
     AND g.GenreID = g_m.GenreID AND m.MovieID = g_m.MovieID
     AND d.DirectorID = d_m.DirectorID AND m.MovieID = d_m.MovieID
     AND a.ActorID = a_m.ActorID AND m.MovieID = a_m.MovieID
+    AND m.MovieID = v.MovieID
   GROUP BY m.MovieID
   ORDER BY h.Date DESC;\n`;
   //
@@ -103,13 +108,10 @@ const editMoviesInfo = (movies, snEp) => {
   result.forEach((element) => (element["Seasons"] = []));
 
   snEp.forEach((element) => {
-    result
-      .filter((x) => x.MovieID === element.MovieID)
-      .map((x) =>
-        element.Season
-          ? (x["Seasons"][element.Season] = element.Episodes)
-          : null
-      );
+    result.map((x) => {
+      if (x.MovieID === element.MovieID && element.Season)
+        x["Seasons"][element.Season] = element.Episodes;
+    });
   });
 
   return result;
@@ -118,6 +120,83 @@ const editMoviesInfo = (movies, snEp) => {
 ///////////////////////////////////////////////////////////////
 //////////////////////// Endpoints ////////////////////////////
 ///////////////////////////////////////////////////////////////
+
+app.get("/recommendations", userMiddleware.isLoggedIn, (req, res) => {
+  const UserID = req.userData.userId;
+
+  connection.query(
+    getMoviesSqlScript("getAllMovies") +
+      `\nSELECT f.UserID as 'userID', GROUP_CONCAT(DISTINCT f.ID SEPARATOR ', ') as 'favorites'
+      FROM Favorite f
+      GROUP BY f.UserID;`,
+    (error, results) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send();
+      } else {
+        const allMovies = editMoviesInfo(results[1], results[2]);
+
+        results[3].forEach((part, index, arr) => {
+          arr[index].favorites = arr[index].favorites
+            .split(", ")
+            .map((str) => Number(str));
+        });
+
+        const mainUserFavorites = results[3].find((x) => x.userID === UserID);
+        const otherUsers = results[3].filter((x) => x.userID !== UserID);
+
+        let recommendation = [];
+        const k = 5;
+        if (mainUserFavorites.length !== 0 && otherUsers.length >= k) {
+          for (let i = 0; i < otherUsers.length; i++) {
+            otherUsers[i] = {
+              ...otherUsers[i],
+              ...{
+                jacDist: jaccard.distance(
+                  mainUserFavorites,
+                  otherUsers[i].favorites
+                ),
+              },
+            };
+          }
+
+          otherUsers.sort((a, b) => a.jacDist - b.jacDist);
+
+          for (var i = 0; i < allMovies.length; i++) {
+            if (!mainUserFavorites.includes(allMovies[i].MovieID)) {
+              let similaritySum = 0;
+              let count = 0;
+
+              for (var j = 0; j < k; j++) {
+                if (otherUsers[j].favorites.includes(allMovies[i].MovieID)) {
+                  similaritySum += otherUsers[j].jacDist;
+                  count++;
+                }
+              }
+
+              if (similaritySum !== 0) {
+                recommendation.push({
+                  avgSim: similaritySum / count,
+                  movie: allMovies[i],
+                });
+              }
+            }
+          }
+
+          recommendation
+            .sort((a, b) => a.avgSim - b.avgSim)
+            .forEach((el, index) => (recommendation[index] = el.movie));
+        } else
+          recommendation = allMovies
+            .sort((a, b) => new Date(b.ReleaseDate) - new Date(a.ReleaseDate))
+            .slice(0, 10)
+            .sort((a, b) => parseFloat(b.Rating) - parseFloat(a.Rating));
+
+        res.status(200).json(recommendation);
+      }
+    }
+  );
+});
 
 app.get("/movies", userMiddleware.isLoggedIn, (req, res) => {
   connection.query(getMoviesSqlScript("getAllMovies"), (error, results) => {
@@ -440,20 +519,22 @@ app.post("/signin", (req, res) => {
           }
 
           if (bResult) {
-            const token = jwt.sign(
-              {
-                email: result[0].Email,
-                userId: result[0].UserID,
-              },
-              "TMPKEY",
-              {
-                expiresIn: "1d",
-              }
-            );
+            const user = {
+              email: result[0].Email,
+              userId: result[0].UserID,
+            };
+
+            const token = jwt.sign(user, authConfig.secret, {
+              expiresIn: authConfig.tokenLife,
+            });
+            const refreshToken = jwt.sign(user, authConfig.refreshTokenSecret, {
+              expiresIn: authConfig.refreshTokenLife,
+            });
+
             delete result[0].Password;
             res.status(200).json({
               msg: "Logged in!",
-              user: { token, ...result[0] },
+              user: { ...result[0], token, refreshToken },
             });
           } else
             res.status(401).json({

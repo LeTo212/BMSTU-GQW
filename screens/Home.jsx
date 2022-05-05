@@ -13,7 +13,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import PropTypes from "prop-types";
 
-import { getMovies } from "../api";
+import { getRecommendations } from "../api";
 import AuthContext from "../constants/context";
 import CustomStatusBar from "../components/CustomStatusBar";
 import Loading from "../components/Loading";
@@ -98,16 +98,11 @@ const Home = ({ navigation }) => {
   const scrollX = useRef(new Animated.Value(0)).current;
 
   const fetchData = async () => {
-    const mvs = await getMovies(token);
+    const rcm = await getRecommendations(token);
 
-    if (mvs !== "Error") {
-      const filtered = mvs
-        .sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate))
-        .slice(0, 10)
-        .sort((a, b) => b.rating - a.rating);
-
-      setMovies([{ key: "empty-left" }, ...filtered, { key: "empty-right" }]);
-      setCurrentMovie(filtered[0]);
+    if (rcm !== "Error") {
+      setMovies([{ key: "empty-left" }, ...rcm, { key: "empty-right" }]);
+      setCurrentMovie(rcm[0]);
     } else signOut();
   };
 
