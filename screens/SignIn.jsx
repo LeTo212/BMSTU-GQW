@@ -102,16 +102,15 @@ const SignIn = ({ navigation }) => {
 
     const foundUser = await checkUser(userName, password);
 
+    if (foundUser.statusCode === 201) signIn(foundUser.user);
+
     if (foundUser.statusCode === 401) {
       Alert.alert(
         "Неправильный ввод!",
         "Неправильно введен логин или пароль.",
         [{ text: "Хорошо" }]
       );
-      return;
     }
-
-    signIn(foundUser.user);
   };
 
   return (

@@ -208,14 +208,13 @@ const App = () => {
                 initialRoute="Home"
                 activeColor="#2E4053"
                 inactiveColor="#94B0B9"
-                style={{ backgroundColor: "#000" }}
                 barStyle={{ backgroundColor: Colors.secondary }}
               >
                 <Tab.Screen
                   name="Home"
                   component={HomeNav}
                   options={{
-                    tabBarLabel: "",
+                    tabBarLabel: "Главное",
                     tabBarIcon: ({ color }) => (
                       <MaterialCommunityIcons
                         name="home"
@@ -229,7 +228,7 @@ const App = () => {
                   name="Search"
                   component={SearchNav}
                   options={{
-                    tabBarLabel: "",
+                    tabBarLabel: "Поиск",
                     tabBarIcon: ({ color }) => (
                       <AntDesign name="search1" color={color} size={28} />
                     ),
@@ -239,7 +238,7 @@ const App = () => {
                   name="Profile"
                   component={ProfileNav}
                   options={{
-                    tabBarLabel: "",
+                    tabBarLabel: "Профиль",
                     tabBarIcon: ({ color }) => (
                       <MaterialCommunityIcons
                         name="account"
@@ -253,7 +252,7 @@ const App = () => {
                   name="Help"
                   component={Help}
                   options={{
-                    tabBarLabel: "",
+                    tabBarLabel: "Справка",
                     tabBarIcon: ({ color }) => (
                       <MaterialCommunityIcons
                         name="help"

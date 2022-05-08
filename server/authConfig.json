@@ -1,6 +1,4 @@
 {
   "secret": "TMPKEY",
-  "refreshTokenSecret": "REFRESH_TMPKEY",
-  "tokenLife": 900,
-  "refreshTokenLife": 86400
+  "tokenLife": 86400
 }

@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 const jaccard = require("jaccard");
 
 const DEFAULT_PATH = "/Users/dominyk/Desktop/GCW Database/Movies";
-const authConfig = require("./authConfig");
+const authConfig = require("./authConfig.json");
 const userMiddleware = require("./middleware/users");
 
 app.use(bodyParser.json({ type: "application/json" }));
@@ -245,14 +245,13 @@ app.get(
               const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
 
               if (start >= fileSize) {
-                res
-                  .status(416)
-                  .send(
+                res.status(416).json({
+                  msg:
                     "Requested range not satisfiable\n" +
-                      start +
-                      " >= " +
-                      fileSize
-                  );
+                    start +
+                    " >= " +
+                    fileSize,
+                });
                 return;
               }
 
@@ -493,9 +492,12 @@ app.get("/types_genres", (req, res) => {
 
 //// Authentication
 //
-app.post("/signin", (req, res) => {
+app.post("/signin", userMiddleware.validateLogin, (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
   connection.query(
-    `SELECT * FROM User WHERE Email = ${connection.escape(req.body.email)};`,
+    `SELECT * FROM User WHERE Email = ${connection.escape(email)};`,
     (err, result) => {
       if (err) {
         console.log(err);
@@ -504,17 +506,13 @@ app.post("/signin", (req, res) => {
 
       if (!result.length) {
         res.status(401).json({
-          msg: "Username or password is incorrect!",
+          msg: "Username or password is incorrect",
         });
-      }
-
-      bcrypt.compare(
-        req.body.password,
-        result[0]["Password"],
-        (bErr, bResult) => {
+      } else
+        bcrypt.compare(password, result[0]["Password"], (bErr, bResult) => {
           if (bErr) {
             res.status(401).json({
-              msg: "Username or password is incorrect!",
+              msg: "Username or password is incorrect",
             });
           }
 
@@ -527,21 +525,17 @@ app.post("/signin", (req, res) => {
             const token = jwt.sign(user, authConfig.secret, {
               expiresIn: authConfig.tokenLife,
             });
-            const refreshToken = jwt.sign(user, authConfig.refreshTokenSecret, {
-              expiresIn: authConfig.refreshTokenLife,
-            });
 
             delete result[0].Password;
-            res.status(200).json({
-              msg: "Logged in!",
-              user: { ...result[0], token, refreshToken },
+            res.status(201).json({
+              msg: "Logged in",
+              user: { ...result[0], token },
             });
           } else
             res.status(401).json({
-              msg: "Username or password is incorrect!",
+              msg: "Username or password is incorrect",
             });
-        }
-      );
+        });
     }
   );
 });
@@ -560,7 +554,7 @@ app.post("/signup", userMiddleware.validateRegister, (req, res) => {
     (err, result) => {
       if (result.length) {
         res.status(409).json({
-          msg: "This username is already in use!",
+          msg: "This username is already in use",
         });
       } else {
         bcrypt.hash(password, 10, (err, hash) => {
@@ -584,7 +578,7 @@ app.post("/signup", userMiddleware.validateRegister, (req, res) => {
                   res.status(500).send();
                 } else
                   res.status(201).json({
-                    msg: "Registered!",
+                    msg: "Registered",
                   });
               }
             );
