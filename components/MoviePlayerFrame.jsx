@@ -8,27 +8,6 @@ import { getVideoPath, addToHistory } from "../api";
 import MoviePlayer from "./MoviePlayer";
 
 const { width } = Dimensions.get("window");
-const pickerStyle = {
-  inputIOS: {
-    color: "black",
-    width: 30,
-    height: 30,
-    textAlign: "center",
-    borderTopWidth: 1,
-    borderRightWidth: 1,
-    borderBottomWidth: 1,
-    borderLeftWidth: 1,
-    borderRadius: 3,
-    fontSize: 15,
-    fontWeight: "400",
-  },
-  inputAndroid: {
-    color: "black",
-    width: 80,
-    height: 60,
-    fontWeight: "400",
-  },
-};
 
 const MoviePlayerFrame = ({ token, movieInfo }) => {
   const [season, setSeason] = useState("1");
@@ -93,12 +72,13 @@ const MoviePlayerFrame = ({ token, movieInfo }) => {
           />
           {movieInfo.seasons.length !== 0 ? (
             <View style={styles.pickersContainer}>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Text style={{ marginRight: "5%" }}>Сезон</Text>
+              <View style={styles.textContainer}>
+                <Text style={styles.text}>Сезон:</Text>
                 <RNPickerSelect
                   items={[{ label: "1", value: "1" }, ...seasonsList]}
                   selectedValue={season}
                   placeholder={{}}
+                  useNativeAndroidPickerStyle={false}
                   style={pickerStyle}
                   onValueChange={(item) => {
                     onChange(item, episode);
@@ -106,12 +86,13 @@ const MoviePlayerFrame = ({ token, movieInfo }) => {
                 />
               </View>
 
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Text style={{ marginRight: "5%" }}>Серия</Text>
+              <View style={styles.textContainer}>
+                <Text style={styles.text}>Серия:</Text>
                 <RNPickerSelect
                   items={[{ label: "1", value: "1" }, ...episodesList]}
                   selectedValue={episode}
                   placeholder={{}}
+                  useNativeAndroidPickerStyle={false}
                   style={pickerStyle}
                   onValueChange={(item) => {
                     onChange(season, item);
@@ -141,6 +122,27 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-around",
+  },
+  textContainer: { flexDirection: "row", alignItems: "center" },
+  text: { marginRight: "8%", color: "black" },
+});
+
+const pickerStyle = StyleSheet.create({
+  inputIOS: {
+    textAlign: "center",
+    paddingVertical: "3%",
+    paddingHorizontal: "4%",
+    borderWidth: 1,
+    borderRadius: 8,
+    color: "black",
+  },
+  inputAndroid: {
+    textAlign: "center",
+    paddingHorizontal: "2%",
+    paddingVertical: "1%",
+    borderWidth: 1,
+    borderRadius: 8,
+    color: "black",
   },
 });
 

@@ -46,13 +46,8 @@ const editMovies = (movies) =>
 
 export const getTypesAndGenres = async () => {
   const results = await fetch(`${API_URL}/types_genres`).then((x) => x.json());
-  const info = {
-    types: results.Types.map((item) => ({ label: item, value: item })),
-    genres: results.Genres.map((item) => ({ label: item, value: item })),
-  };
-  info.types.unshift({ label: "Любые", value: "", selected: true });
-  info.genres.unshift({ label: "Любые", value: "", selected: true });
-  return info;
+
+  return results;
 };
 
 export const getMovies = async (token) => {

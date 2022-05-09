@@ -11,10 +11,6 @@ import {
   NavigationContainer,
   DefaultTheme as NavigationDefaultTheme,
 } from "@react-navigation/native";
-import {
-  Provider as PaperProvider,
-  DefaultTheme as PaperDefaultTheme,
-} from "react-native-paper";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import { MaterialCommunityIcons, AntDesign } from "@expo/vector-icons";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -58,7 +54,6 @@ const App = () => {
 
   const theme = {
     ...NavigationDefaultTheme,
-    ...PaperDefaultTheme,
     colors: {
       background: "#ffffff",
       text: "#333333",
@@ -182,7 +177,12 @@ const App = () => {
   if (loginState.isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator
+          animating
+          size="large"
+          style={{ opacity: 1 }}
+          color={Colors.primary}
+        />
       </View>
     );
   }
@@ -200,75 +200,73 @@ const App = () => {
   return (
     <SafeAreaProvider style={styles.screen}>
       <StatusBar translucent backgroundColor={Colors.secondary} />
-      <PaperProvider theme={theme}>
-        <AuthContext.Provider value={authContext}>
-          <NavigationContainer theme={theme}>
-            {loginState.userToken !== null ? (
-              <Tab.Navigator
-                initialRoute="Home"
-                activeColor="#2E4053"
-                inactiveColor="#94B0B9"
-                barStyle={{ backgroundColor: Colors.secondary }}
-              >
-                <Tab.Screen
-                  name="Home"
-                  component={HomeNav}
-                  options={{
-                    tabBarLabel: "Главное",
-                    tabBarIcon: ({ color }) => (
-                      <MaterialCommunityIcons
-                        name="home"
-                        color={color}
-                        size={28}
-                      />
-                    ),
-                  }}
-                />
-                <Tab.Screen
-                  name="Search"
-                  component={SearchNav}
-                  options={{
-                    tabBarLabel: "Поиск",
-                    tabBarIcon: ({ color }) => (
-                      <AntDesign name="search1" color={color} size={28} />
-                    ),
-                  }}
-                />
-                <Tab.Screen
-                  name="Profile"
-                  component={ProfileNav}
-                  options={{
-                    tabBarLabel: "Профиль",
-                    tabBarIcon: ({ color }) => (
-                      <MaterialCommunityIcons
-                        name="account"
-                        color={color}
-                        size={28}
-                      />
-                    ),
-                  }}
-                />
-                <Tab.Screen
-                  name="Help"
-                  component={Help}
-                  options={{
-                    tabBarLabel: "Справка",
-                    tabBarIcon: ({ color }) => (
-                      <MaterialCommunityIcons
-                        name="help"
-                        color={color}
-                        size={28}
-                      />
-                    ),
-                  }}
-                />
-              </Tab.Navigator>
-            ) : (
-              <AuthNav />
-            )}
-          </NavigationContainer>
-        </AuthContext.Provider>
-      </PaperProvider>
+      <AuthContext.Provider value={authContext}>
+        <NavigationContainer theme={theme}>
+          {loginState.userToken !== null ? (
+            <Tab.Navigator
+              initialRoute="Home"
+              activeColor="#2E4053"
+              inactiveColor="#94B0B9"
+              barStyle={{ backgroundColor: Colors.secondary }}
+            >
+              <Tab.Screen
+                name="Home"
+                component={HomeNav}
+                options={{
+                  tabBarLabel: "Главное",
+                  tabBarIcon: ({ color }) => (
+                    <MaterialCommunityIcons
+                      name="home"
+                      color={color}
+                      size={28}
+                    />
+                  ),
+                }}
+              />
+              <Tab.Screen
+                name="Search"
+                component={SearchNav}
+                options={{
+                  tabBarLabel: "Поиск",
+                  tabBarIcon: ({ color }) => (
+                    <AntDesign name="search1" color={color} size={28} />
+                  ),
+                }}
+              />
+              <Tab.Screen
+                name="Profile"
+                component={ProfileNav}
+                options={{
+                  tabBarLabel: "Профиль",
+                  tabBarIcon: ({ color }) => (
+                    <MaterialCommunityIcons
+                      name="account"
+                      color={color}
+                      size={28}
+                    />
+                  ),
+                }}
+              />
+              <Tab.Screen
+                name="Help"
+                component={Help}
+                options={{
+                  tabBarLabel: "Справка",
+                  tabBarIcon: ({ color }) => (
+                    <MaterialCommunityIcons
+                      name="help"
+                      color={color}
+                      size={28}
+                    />
+                  ),
+                }}
+              />
+            </Tab.Navigator>
+          ) : (
+            <AuthNav />
+          )}
+        </NavigationContainer>
+      </AuthContext.Provider>
     </SafeAreaProvider>
   );
 };

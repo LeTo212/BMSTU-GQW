@@ -74,7 +74,7 @@ const Favorites = ({ navigation }) => {
           <MovieListItem key={movie.key} movie={movie.item} />
         </TouchableOpacity>
       )}
-      ListEmptyComponent={() => <NotFound>Empty</NotFound>}
+      ListEmptyComponent={() => <NotFound>Пусто</NotFound>}
     />
   );
 };

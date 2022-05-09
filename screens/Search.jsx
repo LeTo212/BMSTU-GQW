@@ -9,7 +9,7 @@ import {
   Platform,
 } from "react-native";
 import { Searchbar } from "react-native-paper";
-import DropDownPicker from "react-native-dropdown-picker";
+import RNPickerSelect from "react-native-picker-select";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { debounce } from "lodash";
@@ -51,8 +51,13 @@ const Search = ({ navigation }) => {
       if (mvs !== "Error") {
         const lst = await getTypesAndGenres();
 
+        const tmp = {
+          types: lst.Types.map((item) => ({ label: item, value: item })),
+          genres: lst.Genres.map((item) => ({ label: item, value: item })),
+        };
+
+        setList(tmp);
         setMovies(mvs);
-        setList(lst);
         setSearchResult(mvs);
       } else signOut();
     };
@@ -111,38 +116,32 @@ const Search = ({ navigation }) => {
         />
 
         <View style={styles.dropDownPickersContainer}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={{ marginRight: "2%" }}>Тип</Text>
-            <DropDownPicker
-              items={list.types}
-              defaultValue={type}
-              containerStyle={{ height: 40, width: 110 }}
-              style={{ backgroundColor: "#fafafa" }}
-              itemStyle={{
-                justifyContent: "flex-start",
-              }}
-              dropDownStyle={{ backgroundColor: "#fafafa" }}
-              onChangeItem={(item) => {
-                setType(item.value);
-                handler(searchQuery, item.value, genre);
+          <View style={styles.container}>
+            <Text style={styles.text}>Тип:</Text>
+            <RNPickerSelect
+              items={[{ label: "Любые", value: "" }, ...list.types]}
+              selectedValue={type}
+              placeholder={{}}
+              useNativeAndroidPickerStyle={false}
+              style={pickerStyle}
+              onValueChange={(item) => {
+                setType(item);
+                handler(searchQuery, item, genre);
               }}
             />
           </View>
 
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={{ marginRight: "2%" }}>Жанр</Text>
-            <DropDownPicker
-              items={list.genres}
-              defaultValue={genre}
-              containerStyle={{ height: 40, width: 110 }}
-              style={{ backgroundColor: "#fafafa" }}
-              itemStyle={{
-                justifyContent: "flex-start",
-              }}
-              dropDownStyle={{ backgroundColor: "#fafafa" }}
-              onChangeItem={(item) => {
-                setGenre(item.value);
-                handler(searchQuery, type, item.value);
+          <View style={styles.container}>
+            <Text style={styles.text}>Жанр:</Text>
+            <RNPickerSelect
+              items={[{ label: "Любые", value: "" }, ...list.genres]}
+              selectedValue={genre}
+              placeholder={{}}
+              useNativeAndroidPickerStyle={false}
+              style={pickerStyle}
+              onValueChange={(item) => {
+                setGenre(item);
+                handler(searchQuery, type, item);
               }}
             />
           </View>
@@ -163,18 +162,12 @@ const Search = ({ navigation }) => {
             <MovieListItem key={movie.key} movie={movie.item} />
           </TouchableOpacity>
         )}
-        ListEmptyComponent={() => <NotFound>Not Found</NotFound>}
+        ListEmptyComponent={() => <NotFound>Пусто</NotFound>}
       />
 
       <LinearGradient
         colors={["rgba(0, 0, 0, 0)", Colors.primary]}
-        style={{
-          height: height / 3,
-          width,
-          position: "absolute",
-          bottom: 0,
-          zIndex: -100,
-        }}
+        style={styles.backgroundLinearGradient}
       />
     </>
   );
@@ -208,9 +201,37 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
   },
+  container: { flexDirection: "row", alignItems: "center" },
+  text: { marginRight: "8%" },
   list: {
     width: "100%",
     height: "100%",
+  },
+  backgroundLinearGradient: {
+    height: height / 3,
+    width,
+    position: "absolute",
+    bottom: 0,
+    zIndex: -100,
+  },
+});
+
+const pickerStyle = StyleSheet.create({
+  inputIOS: {
+    textAlign: "center",
+    paddingVertical: "2%",
+    paddingHorizontal: "2%",
+    borderWidth: 1,
+    borderRadius: 8,
+    color: "black",
+  },
+  inputAndroid: {
+    textAlign: "center",
+    paddingHorizontal: "2%",
+    paddingVertical: "1%",
+    borderWidth: 1,
+    borderRadius: 8,
+    color: "black",
   },
 });
 

@@ -7200,13 +7200,6 @@ react-native-codegen@^0.0.6:
     jscodeshift "^0.11.0"
     nullthrows "^1.1.1"
 
-react-native-dropdown-picker@^3.7.1:
-  version "3.8.3"
-  resolved "https://registry.npmjs.org/react-native-dropdown-picker/-/react-native-dropdown-picker-3.8.3.tgz"
-  integrity sha512-47Fo9SV1SuZWxifTS8jW0qcIi394LpBIQNHfoqFz/YpwSnp45UDdbLiKiAmQPlm5yuduODLvwyU88W4+xWSwhg==
-  dependencies:
-    react-native-vector-icons "^7.0.0"
-
 react-native-gesture-handler@~2.1.0:
   version "2.1.1"
   resolved "https://registry.npmjs.org/react-native-gesture-handler/-/react-native-gesture-handler-2.1.1.tgz"
@@ -7286,7 +7279,7 @@ react-native-status-bar-height@^2.5.0:
   resolved "https://registry.npmjs.org/react-native-status-bar-height/-/react-native-status-bar-height-2.6.0.tgz"
   integrity sha512-z3SGLF0mHT+OlJDq7B7h/jXPjWcdBT3V14Le5L2PjntjjWM3+EJzq2BcXDwV+v67KFNJic5pgA26cCmseYek6w==
 
-react-native-vector-icons@^7.0.0, react-native-vector-icons@^7.1.0:
+react-native-vector-icons@^7.1.0:
   version "7.1.0"
   resolved "https://registry.npmjs.org/react-native-vector-icons/-/react-native-vector-icons-7.1.0.tgz"
   integrity sha512-V2a1zJ4i+kS8O4j183gIwX14St9AxxXabxwYpFBgRhvr2NDXyFcjHDEAgrOYYlt2W57e20aN1tBDU/I+wn9WtQ==

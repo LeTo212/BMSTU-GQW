@@ -15,8 +15,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Feather from "react-native-vector-icons/Feather";
 
-import { useTheme } from "react-native-paper";
-
 import { checkUser } from "../api";
 import AuthContext from "../constants/context";
 import Colors from "../constants/colors";
@@ -30,8 +28,6 @@ const SignIn = ({ navigation }) => {
     isValidUser: true,
     isValidPassword: true,
   });
-
-  const { colors } = useTheme();
 
   const { signIn } = React.useContext(AuthContext);
 
@@ -158,7 +154,7 @@ const SignIn = ({ navigation }) => {
         >
           <Text style={styles.textFooter}>Пароль</Text>
           <View style={styles.action}>
-            <Feather name="lock" color={colors.text} size={20} />
+            <Feather name="lock" size={20} />
             <TextInput
               placeholder="Введите пароль"
               placeholderTextColor="#666666"
