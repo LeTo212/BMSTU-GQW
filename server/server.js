@@ -60,7 +60,7 @@ const getMoviesSqlScript = (mode, userID) => {
 
   const getFavorites = `FROM Favorite f, User u, Movie m, Type t, Genre g, Director_Movie d_m, Director d, Genre_Movie g_m, Actor a, Actor_Movie a_m, Video v
   WHERE u.UserID = ${connection.escape(userID)}
-    AND u.UserID = f.UserID AND f.MovieID = m.MovieID AND isValid = 1
+    AND u.UserID = f.UserID AND f.MovieID = m.MovieID AND f.isValid = 1
     AND m.TypeID = t.TypeID
     AND g.GenreID = g_m.GenreID AND m.MovieID = g_m.MovieID
     AND d.DirectorID = d_m.DirectorID AND m.MovieID = d_m.MovieID
@@ -126,8 +126,9 @@ app.get("/recommendations", userMiddleware.isLoggedIn, (req, res) => {
 
   connection.query(
     getMoviesSqlScript("getAllMovies") +
-      `\nSELECT f.UserID as 'userID', GROUP_CONCAT(DISTINCT f.ID SEPARATOR ', ') as 'favorites'
+      `\nSELECT f.UserID as 'userID', GROUP_CONCAT(DISTINCT f.MovieID SEPARATOR ', ') as 'favorites'
       FROM Favorite f
+      WHERE f.isValid = 1
       GROUP BY f.UserID;`,
     (error, results) => {
       if (error) {
@@ -135,25 +136,30 @@ app.get("/recommendations", userMiddleware.isLoggedIn, (req, res) => {
         res.status(500).send();
       } else {
         const allMovies = editMoviesInfo(results[1], results[2]);
+        const allUsers = results[3];
 
-        results[3].forEach((part, index, arr) => {
+        allUsers.forEach((part, index, arr) => {
           arr[index].favorites = arr[index].favorites
             .split(", ")
             .map((str) => Number(str));
         });
 
-        const mainUserFavorites = results[3].find((x) => x.userID === UserID);
-        const otherUsers = results[3].filter((x) => x.userID !== UserID);
+        const mainUserFavorites = allUsers.find((x) => x.userID === UserID);
+        const otherUsers = allUsers.filter((x) => x.userID !== UserID);
 
         let recommendations = [];
         const k = 5;
-        if (mainUserFavorites.length !== 0 && otherUsers.length >= k) {
+        if (
+          mainUserFavorites &&
+          mainUserFavorites.favorites.length !== 0 &&
+          otherUsers.length >= k
+        ) {
           for (let i = 0; i < otherUsers.length; i += 1) {
             otherUsers[i] = {
               ...otherUsers[i],
               ...{
                 jacDist: jaccard.distance(
-                  mainUserFavorites,
+                  mainUserFavorites.favorites,
                   otherUsers[i].favorites
                 ),
               },
@@ -165,7 +171,7 @@ app.get("/recommendations", userMiddleware.isLoggedIn, (req, res) => {
           while (otherUsers[0].jacDist === 0) otherUsers.shift();
 
           for (let i = 0; i < allMovies.length; i += 1) {
-            if (!mainUserFavorites.includes(allMovies[i].MovieID)) {
+            if (!mainUserFavorites.favorites.includes(allMovies[i].MovieID)) {
               let similaritySum = 0;
               let count = 0;
 
