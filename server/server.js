@@ -145,10 +145,10 @@ app.get("/recommendations", userMiddleware.isLoggedIn, (req, res) => {
         const mainUserFavorites = results[3].find((x) => x.userID === UserID);
         const otherUsers = results[3].filter((x) => x.userID !== UserID);
 
-        let recommendation = [];
+        let recommendations = [];
         const k = 5;
         if (mainUserFavorites.length !== 0 && otherUsers.length >= k) {
-          for (let i = 0; i < otherUsers.length; i++) {
+          for (let i = 0; i < otherUsers.length; i += 1) {
             otherUsers[i] = {
               ...otherUsers[i],
               ...{
@@ -162,20 +162,22 @@ app.get("/recommendations", userMiddleware.isLoggedIn, (req, res) => {
 
           otherUsers.sort((a, b) => a.jacDist - b.jacDist);
 
-          for (var i = 0; i < allMovies.length; i++) {
+          while (otherUsers[0].jacDist === 0) otherUsers.shift();
+
+          for (let i = 0; i < allMovies.length; i += 1) {
             if (!mainUserFavorites.includes(allMovies[i].MovieID)) {
               let similaritySum = 0;
               let count = 0;
 
-              for (var j = 0; j < k; j++) {
+              for (let j = 0; j < k; j += 1) {
                 if (otherUsers[j].favorites.includes(allMovies[i].MovieID)) {
                   similaritySum += otherUsers[j].jacDist;
-                  count++;
+                  count += 1;
                 }
               }
 
-              if (similaritySum !== 0) {
-                recommendation.push({
+              if (similaritySum !== 0 && count !== 0) {
+                recommendations.push({
                   avgSim: similaritySum / count,
                   movie: allMovies[i],
                 });
@@ -183,16 +185,17 @@ app.get("/recommendations", userMiddleware.isLoggedIn, (req, res) => {
             }
           }
 
-          recommendation
+          recommendations
             .sort((a, b) => a.avgSim - b.avgSim)
-            .forEach((el, index) => (recommendation[index] = el.movie));
+            .slice(0, 10)
+            .forEach((el, index) => (recommendations[index] = el.movie));
         } else
-          recommendation = allMovies
+          recommendations = allMovies
             .sort((a, b) => new Date(b.ReleaseDate) - new Date(a.ReleaseDate))
             .slice(0, 10)
             .sort((a, b) => parseFloat(b.Rating) - parseFloat(a.Rating));
 
-        res.status(200).json(recommendation);
+        res.status(200).json(recommendations);
       }
     }
   );
