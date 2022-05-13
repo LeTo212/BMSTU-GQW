@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const jaccard = require("jaccard");
 
-const DEFAULT_PATH = "/Users/dominyk/Desktop/GCW Database/Movies";
+const DEFAULT_PATH = "/Users/dominyk/Desktop/GQW Database/Movies";
 const authConfig = require("./authConfig.json");
 const userMiddleware = require("./middleware/users");
 
@@ -144,14 +144,14 @@ app.get("/recommendations", userMiddleware.isLoggedIn, (req, res) => {
             .map((str) => Number(str));
         });
 
-        const mainUserFavorites = allUsers.find((x) => x.userID === UserID);
+        const mainUser = allUsers.find((x) => x.userID === UserID);
         const otherUsers = allUsers.filter((x) => x.userID !== UserID);
 
         let recommendations = [];
         const k = 5;
         if (
-          mainUserFavorites &&
-          mainUserFavorites.favorites.length !== 0 &&
+          mainUser &&
+          mainUser.favorites.length !== 0 &&
           otherUsers.length >= k
         ) {
           for (let i = 0; i < otherUsers.length; i += 1) {
@@ -159,7 +159,7 @@ app.get("/recommendations", userMiddleware.isLoggedIn, (req, res) => {
               ...otherUsers[i],
               ...{
                 jacDist: jaccard.distance(
-                  mainUserFavorites.favorites,
+                  mainUser.favorites,
                   otherUsers[i].favorites
                 ),
               },
@@ -171,7 +171,7 @@ app.get("/recommendations", userMiddleware.isLoggedIn, (req, res) => {
           while (otherUsers[0].jacDist === 0) otherUsers.shift();
 
           for (let i = 0; i < allMovies.length; i += 1) {
-            if (!mainUserFavorites.favorites.includes(allMovies[i].MovieID)) {
+            if (!mainUser.favorites.includes(allMovies[i].MovieID)) {
               let similaritySum = 0;
               let count = 0;
 
