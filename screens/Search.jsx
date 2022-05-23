@@ -99,54 +99,50 @@ const Search = ({ navigation }) => {
   }
 
   return (
-    <>
-      <SafeAreaView style={styles.header} edges={["right", "left", "top"]}>
-        <Searchbar
-          placeholder="Поиск"
-          onChangeText={(query) => {
-            setSearchQuery(query);
-            handler(query, type, genre);
-          }}
-          value={searchQuery}
-          style={
-            Platform.OS === "ios"
-              ? styles.searchbarIOS
-              : styles.searchbarAndroid
-          }
-        />
+    <SafeAreaView style={styles.screen} edges={["right", "left", "top"]}>
+      <Searchbar
+        placeholder="Поиск"
+        onChangeText={(query) => {
+          setSearchQuery(query);
+          handler(query, type, genre);
+        }}
+        value={searchQuery}
+        style={
+          Platform.OS === "ios" ? styles.searchbarIOS : styles.searchbarAndroid
+        }
+      />
 
-        <View style={styles.dropDownPickersContainer}>
-          <View style={styles.container}>
-            <Text style={styles.text}>Тип:</Text>
-            <RNPickerSelect
-              items={[{ label: "Любые", value: "" }, ...list.types]}
-              selectedValue={type}
-              placeholder={{}}
-              useNativeAndroidPickerStyle={false}
-              style={pickerStyle}
-              onValueChange={(item) => {
-                setType(item);
-                handler(searchQuery, item, genre);
-              }}
-            />
-          </View>
-
-          <View style={styles.container}>
-            <Text style={styles.text}>Жанр:</Text>
-            <RNPickerSelect
-              items={[{ label: "Любые", value: "" }, ...list.genres]}
-              selectedValue={genre}
-              placeholder={{}}
-              useNativeAndroidPickerStyle={false}
-              style={pickerStyle}
-              onValueChange={(item) => {
-                setGenre(item);
-                handler(searchQuery, type, item);
-              }}
-            />
-          </View>
+      <View style={styles.dropDownPickersContainer}>
+        <View style={styles.container}>
+          <Text style={styles.text}>Тип:</Text>
+          <RNPickerSelect
+            items={[{ label: "Любые", value: "" }, ...list.types]}
+            selectedValue={type}
+            placeholder={{}}
+            useNativeAndroidPickerStyle={false}
+            style={pickerStyle}
+            onValueChange={(item) => {
+              setType(item);
+              handler(searchQuery, item, genre);
+            }}
+          />
         </View>
-      </SafeAreaView>
+
+        <View style={styles.container}>
+          <Text style={styles.text}>Жанр:</Text>
+          <RNPickerSelect
+            items={[{ label: "Любые", value: "" }, ...list.genres]}
+            selectedValue={genre}
+            placeholder={{}}
+            useNativeAndroidPickerStyle={false}
+            style={pickerStyle}
+            onValueChange={(item) => {
+              setGenre(item);
+              handler(searchQuery, type, item);
+            }}
+          />
+        </View>
+      </View>
 
       <FlatList
         style={styles.list}
@@ -169,14 +165,14 @@ const Search = ({ navigation }) => {
         colors={["rgba(0, 0, 0, 0)", Colors.primary]}
         style={styles.backgroundLinearGradient}
       />
-    </>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  header: {
+  screen: {
+    flex: 1,
     backgroundColor: Colors.background,
-    zIndex: 100,
   },
   searchbarAndroid: {
     marginTop: "3%",
