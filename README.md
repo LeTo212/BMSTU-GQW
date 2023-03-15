@@ -1,7 +1,7 @@
 <!-- UNIVERSITY LOGO -->
 <div align="center">
   <a href="https://bmstu.ru">
-    <img src="https://i.ibb.co/7r5KhBw/image1.png" alt="University logo" height="200">
+    <img src="https://user-images.githubusercontent.com/67475107/225371733-8fd6f639-bf62-49bd-866c-4e08116fa20c.png" alt="University logo" height="200">
   </a>
   
   <h3 align="center">Graduation Qualifying Work</h3>
@@ -35,37 +35,37 @@ The purpose of the work is to develop a mobile application for Android and IOS t
 ## Screenshots
 
 <p align="center">
-  <img width="400" src="https://i.ibb.co/W63vgML/13.png">
-  <img width="400" src="https://i.ibb.co/yQRLswn/14.png">
+  <img width="400" src="https://user-images.githubusercontent.com/67475107/225373039-65dd468d-a2da-447d-af48-beed9a21513c.png">
+  <img width="400" src="https://user-images.githubusercontent.com/67475107/225373069-5e854b31-fc26-4ed3-b1fb-6d3019498cae.png">
 </p>
 
 <p align="center">
-  <img width="400" src="https://i.ibb.co/QCWzqMw/16.png">
-  <img width="400" src="https://i.ibb.co/P6RZ4NJ/17.png">
+  <img width="400" src="https://user-images.githubusercontent.com/67475107/225373259-f41c5097-e79c-4020-8560-bbe33be311f9.png">
+  <img width="400" src="https://user-images.githubusercontent.com/67475107/225373379-6fcbf7da-22d7-40a0-85c1-6527f4989169.png">
 </p>
 
 <p align="center">
-  <img width="400" src="https://i.ibb.co/mq1b38c/20.png">
-  <img width="400" src="https://i.ibb.co/VmVbvZq/23.png">
+  <img width="400" src="https://user-images.githubusercontent.com/67475107/225375352-0fb8278d-4ddd-426b-8beb-b57ccba2a09b.png">
+  <img width="400" src="https://user-images.githubusercontent.com/67475107/225375560-5f80ce31-74b5-4553-b013-e4685cffa28c.png">
 </p>
 
 <p align="center">
-  <img width="400" src="https://i.ibb.co/LpZrRmp/21.png">
-  <img width="400" src="https://i.ibb.co/5WyFncv/22.png">
+  <img width="400" src="https://user-images.githubusercontent.com/67475107/225375373-23692af8-9a01-4c88-9d38-a1b7ec6a3227.png">
+  <img width="400" src="https://user-images.githubusercontent.com/67475107/225375646-42d14970-c900-4624-8506-191377aaeae8.png">
 </p>
 
 <p align="center">
-  <img width="400" src="https://i.ibb.co/ZfyDnhq/1.png">
-  <img width="400" src="https://i.ibb.co/WPJS3cw/25.png">
+  <img width="400" src="https://user-images.githubusercontent.com/67475107/225375791-119d6759-ede7-4baf-8988-d2710bb49f4a.png">
+  <img width="400" src="https://user-images.githubusercontent.com/67475107/225375826-152c23d9-d7bb-4bfd-a289-4a8fb3df784f.png">
 </p>
 
 <p align="center">
-  <img src="https://i.ibb.co/m6LVLcj/26.png">
+  <img src="https://user-images.githubusercontent.com/67475107/225375960-65746eb7-7ce2-462e-9250-c08e76e3abed.png">
 </p>
 
 <!-- DATABASE MODEL -->
 ## Database Model
 
 <p align="center">
-  <img src="https://i.ibb.co/qdHjT3C/10.png">
+  <img src="https://user-images.githubusercontent.com/67475107/225376063-358b7398-5625-45e5-8df3-d7800d559d32.png">
 </p>
