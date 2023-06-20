@@ -4,7 +4,8 @@
     <img src="https://user-images.githubusercontent.com/67475107/225371733-8fd6f639-bf62-49bd-866c-4e08116fa20c.png" alt="University logo" height="200">
   </a>
   
-  <h3 align="center">Graduation Qualifying Work</h3>
+  <h3>Graduation Qualifying Work</h3>
+  Developed by Dominykas Miezanskas (<a href="https://www.linkedin.com/in/dominykas-miezanskas/">LinkedIn</a>)
   <br/>
 </div>
 
